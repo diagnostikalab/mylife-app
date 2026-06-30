@@ -1116,6 +1116,90 @@ a { color: inherit; text-decoration: none; }
   </div>
 </div>
 
+<!-- View/Edit Diary Entry -->
+<div class="modal-overlay" id="modal-diary-view">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div class="modal-title" style="margin:0;">Запись</div>
+      <button onclick="deleteCurrentDiary()" style="color:var(--rose);font-size:13px;font-weight:500;padding:6px 10px;border-radius:8px;border:1px solid var(--rose);">Удалить</button>
+    </div>
+    <div class="field">
+      <label>Дата</label>
+      <input type="date" id="view-diary-date">
+    </div>
+    <div class="field">
+      <label>Запись</label>
+      <textarea id="view-diary-text" style="min-height:160px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Настроение</label>
+      <div class="rating-row" id="view-diary-mood-row">
+        <button class="rating-btn" onclick="selectRating('view-diary-mood',1,'view-diary-mood-row')">😞</button>
+        <button class="rating-btn" onclick="selectRating('view-diary-mood',2,'view-diary-mood-row')">😕</button>
+        <button class="rating-btn" onclick="selectRating('view-diary-mood',3,'view-diary-mood-row')">😐</button>
+        <button class="rating-btn" onclick="selectRating('view-diary-mood',4,'view-diary-mood-row')">🙂</button>
+        <button class="rating-btn" onclick="selectRating('view-diary-mood',5,'view-diary-mood-row')">😊</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Теги</label>
+      <input type="text" id="view-diary-tags">
+    </div>
+    <div id="view-diary-media-list" style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;"></div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-diary-view')">Закрыть</button>
+      <button class="btn btn-primary" onclick="updateDiary()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- View/Edit Dream Entry -->
+<div class="modal-overlay" id="modal-dream-view">
+  <div class="modal" onclick="event.stopPropagation()" style="background:#1A2235;color:#E8E4DC;">
+    <div class="modal-handle" style="background:#2A3347;"></div>
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;">
+      <div class="modal-title" style="margin:0;color:#E8E4DC;">Сон</div>
+      <button onclick="deleteCurrentDream()" style="color:#E07070;font-size:13px;font-weight:500;padding:6px 10px;border-radius:8px;border:1px solid #E07070;">Удалить</button>
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Дата</label>
+      <input type="date" id="view-dream-date" style="background:#0F1520;border-color:#2A3347;color:#E8E4DC;">
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Описание</label>
+      <textarea id="view-dream-text" style="min-height:160px;background:#0F1520;border-color:#2A3347;color:#E8E4DC;font-family:'Lora',serif;line-height:1.7;"></textarea>
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Ощущение</label>
+      <div class="chips" id="view-dream-feel-chips">
+        <button class="chip" onclick="toggleChip(this,'view-dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Приятный</button>
+        <button class="chip" onclick="toggleChip(this,'view-dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Тревожный</button>
+        <button class="chip" onclick="toggleChip(this,'view-dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Нейтральный</button>
+        <button class="chip" onclick="toggleChip(this,'view-dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Яркий</button>
+        <button class="chip" onclick="toggleChip(this,'view-dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Странный</button>
+      </div>
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Теги</label>
+      <input type="text" id="view-dream-tags" style="background:#0F1520;border-color:#2A3347;color:#E8E4DC;">
+    </div>
+    <div class="field">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
+        <span style="font-size:15px;color:#E8E4DC;">Осознанное сновидение</span>
+        <label class="toggle">
+          <input type="checkbox" id="view-dream-lucid">
+          <span class="toggle-track" style="background:#2A3347;"></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-dream-view')" style="border:1.5px solid #2A3347;color:#8090AA;">Закрыть</button>
+      <button class="btn" onclick="updateDream()" style="background:#2A3B5E;color:#7BAFD4;font-weight:600;">Сохранить</button>
+    </div>
+  </div>
+</div>
+
 <!-- New Note -->
 <div class="modal-overlay" id="modal-note">
   <div class="modal" onclick="event.stopPropagation()">
@@ -1760,6 +1844,9 @@ async function saveDiary() {
   loadDiary();
 }
 
+let currentDiaryId = null;
+let currentDreamId = null;
+
 async function loadDiary() {
   const entries = await dbGetAll('diary');
   entries.sort((a,b) => b.createdAt.localeCompare(a.createdAt));
@@ -1775,22 +1862,68 @@ async function loadDiary() {
     const d = new Date(e.date || e.createdAt);
     const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long',year:'numeric'});
     const preview = e.text.length > 180 ? e.text.slice(0,180) + '...' : e.text;
-    const media = (e.media || []).map(m => {
+    const hasMore = e.text.length > 180;
+    const media = (e.media || []).slice(0,3).map(m => {
       if (m.type && m.type.startsWith('image/')) {
         return `<img src="${m.data}" class="media-thumb" style="object-fit:cover;">`;
       }
       return `<div class="media-thumb">${m.type && m.type.startsWith('video/') ? '🎥' : '🎵'}</div>`;
     }).join('');
     return `
-      <div class="diary-entry">
-        <div class="entry-date">${dateStr}</div>
-        <div class="entry-text">${preview}</div>
-        ${e.mood ? `<span class="entry-mood">${moodEmoji[e.mood]}</span>` : ''}
+      <div class="diary-entry" onclick="openDiaryEntry(${e.id})" style="cursor:pointer;">
+        <div class="entry-date">${dateStr}${e.mood ? ' · ' + moodEmoji[e.mood] : ''}</div>
+        <div class="entry-text" style="margin-top:6px;">${preview}${hasMore ? '<span style="color:var(--text2);"> ···</span>' : ''}</div>
         ${media ? `<div class="entry-media">${media}</div>` : ''}
-        ${e.tags ? `<div style="margin-top:8px;font-size:12px;color:var(--text2);">${e.tags.split(',').map(t=>`<span style="background:var(--teal-light);color:var(--teal);padding:2px 8px;border-radius:10px;margin-right:4px;">${t.trim()}</span>`).join('')}</div>` : ''}
+        ${e.tags ? `<div style="margin-top:8px;">${e.tags.split(',').map(t=>`<span style="background:var(--teal-light);color:var(--teal);padding:2px 8px;border-radius:10px;margin-right:4px;font-size:12px;">${t.trim()}</span>`).join('')}</div>` : ''}
       </div>
     `;
   }).join('');
+}
+
+async function openDiaryEntry(id) {
+  const entry = await dbGet('diary', id);
+  if (!entry) return;
+  currentDiaryId = id;
+  document.getElementById('view-diary-date').value = entry.date || '';
+  document.getElementById('view-diary-text').value = entry.text || '';
+  document.getElementById('view-diary-tags').value = entry.tags || '';
+  if (entry.mood) selectRating('view-diary-mood', entry.mood, 'view-diary-mood-row');
+  else document.querySelectorAll('#view-diary-mood-row .rating-btn').forEach(b => b.classList.remove('selected'));
+
+  const mediaList = document.getElementById('view-diary-media-list');
+  mediaList.innerHTML = (entry.media || []).map(m => {
+    if (m.type && m.type.startsWith('image/')) {
+      return `<img src="${m.data}" style="width:70px;height:70px;object-fit:cover;border-radius:8px;">`;
+    }
+    return `<div class="media-thumb">${m.type && m.type.startsWith('video/') ? '🎥' : '🎵'} <span style="font-size:11px;">${m.name||''}</span></div>`;
+  }).join('');
+
+  document.getElementById('modal-diary-view').classList.add('open');
+}
+
+async function updateDiary() {
+  if (!currentDiaryId) return;
+  const existing = await dbGet('diary', currentDiaryId);
+  await dbPut('diary', {
+    ...existing,
+    id: currentDiaryId,
+    date: document.getElementById('view-diary-date').value,
+    text: document.getElementById('view-diary-text').value,
+    mood: ratings['view-diary-mood'] || existing.mood || null,
+    tags: document.getElementById('view-diary-tags').value,
+  });
+  closeModal('modal-diary-view');
+  toast('Запись обновлена');
+  loadDiary();
+}
+
+async function deleteCurrentDiary() {
+  if (!currentDiaryId) return;
+  if (!confirm('Удалить эту запись? Отменить нельзя.')) return;
+  await dbDelete('diary', currentDiaryId);
+  closeModal('modal-diary-view');
+  toast('Запись удалена');
+  loadDiary();
 }
 
 // ===== DREAMS =====
@@ -1835,11 +1968,12 @@ async function loadDreams() {
     const d = new Date(e.date || e.createdAt);
     const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long'});
     const preview = e.text.length > 200 ? e.text.slice(0,200) + '...' : e.text;
+    const hasMore = e.text.length > 200;
     const tags = e.tags ? e.tags.split(',').map(t => `<span class="dream-tag">${t.trim()}</span>`).join('') : '';
     return `
-      <div class="dream-entry">
+      <div class="dream-entry" onclick="openDreamEntry(${e.id})" style="cursor:pointer;">
         <div class="entry-date">${dateStr}${e.feel ? ' · ' + e.feel : ''}</div>
-        <div class="entry-text" style="margin-top:6px;">${preview}</div>
+        <div class="entry-text" style="margin-top:6px;">${preview}${hasMore ? '<span style="color:#8090AA;"> ···</span>' : ''}</div>
         <div style="margin-top:8px;">
           ${e.lucid ? '<span class="dream-tag lucid">✦ осознанный</span>' : ''}
           ${tags}
@@ -1847,6 +1981,50 @@ async function loadDreams() {
       </div>
     `;
   }).join('');
+}
+
+async function openDreamEntry(id) {
+  const entry = await dbGet('dreams', id);
+  if (!entry) return;
+  currentDreamId = id;
+  document.getElementById('view-dream-date').value = entry.date || '';
+  document.getElementById('view-dream-text').value = entry.text || '';
+  document.getElementById('view-dream-tags').value = entry.tags || '';
+  document.getElementById('view-dream-lucid').checked = !!entry.lucid;
+
+  document.querySelectorAll('#view-dream-feel-chips .chip').forEach(c => {
+    c.classList.toggle('selected', entry.feel && entry.feel.includes(c.textContent.trim()));
+  });
+
+  document.getElementById('modal-dream-view').classList.add('open');
+}
+
+async function updateDream() {
+  if (!currentDreamId) return;
+  const existing = await dbGet('dreams', currentDreamId);
+  const feelEls = document.querySelectorAll('#view-dream-feel-chips .chip.selected');
+  const feel = Array.from(feelEls).map(e => e.textContent.trim()).join(', ');
+  await dbPut('dreams', {
+    ...existing,
+    id: currentDreamId,
+    date: document.getElementById('view-dream-date').value,
+    text: document.getElementById('view-dream-text').value,
+    feel,
+    tags: document.getElementById('view-dream-tags').value,
+    lucid: document.getElementById('view-dream-lucid').checked,
+  });
+  closeModal('modal-dream-view');
+  toast('Сон обновлен');
+  loadDreams();
+}
+
+async function deleteCurrentDream() {
+  if (!currentDreamId) return;
+  if (!confirm('Удалить эту запись? Отменить нельзя.')) return;
+  await dbDelete('dreams', currentDreamId);
+  closeModal('modal-dream-view');
+  toast('Запись удалена');
+  loadDreams();
 }
 
 // ===== NOTES =====
