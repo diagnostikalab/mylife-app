@@ -53,7 +53,16 @@ a { color: inherit; text-decoration: none; }
   padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
 }
 .page.active { display: block; }
-.page-content { padding: 0 16px; max-width: 480px; margin: 0 auto; }
+.page-content {
+  padding: 0 16px;
+  max-width: 480px;
+  margin: 0 auto;
+  width: 100%;
+  box-sizing: border-box;
+  overflow-x: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
+}
 
 /* Dreams page dark theme */
 .page.dreams-theme {
@@ -330,6 +339,11 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 12px;
   box-shadow: var(--shadow);
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .entry-date { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
 .entry-text { font-size: 15px; line-height: 1.6; color: var(--text); }
@@ -366,6 +380,11 @@ a { color: inherit; text-decoration: none; }
   margin-bottom: 12px;
   border: 1px solid #2A3347;
   cursor: pointer;
+  width: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
+  word-break: break-word;
+  overflow-wrap: break-word;
 }
 .dream-entry .entry-date { color: #8090AA; }
 .dream-entry .entry-text { color: #E8E4DC; font-family: 'Lora', serif; line-height: 1.7; }
@@ -856,7 +875,7 @@ a { color: inherit; text-decoration: none; }
     <h1>Дневник</h1>
     <div class="date-sub">Только для тебя</div>
   </div>
-  <div class="page-content section-top" id="diary-list">
+  <div class="page-content section-top" id="diary-list" style="width:100%;">
     <div style="color:var(--text2);font-size:14px;padding:8px 0; background:var(--card); border-radius:var(--radius); padding:16px; text-align:center;">
       Здесь появятся твои записи. Нажми + чтобы написать.
     </div>
@@ -871,7 +890,7 @@ a { color: inherit; text-decoration: none; }
     <h1>Сновидения</h1>
     <div class="date-sub">Мир за закрытыми глазами</div>
   </div>
-  <div class="page-content section-top" id="dreams-list" style="position:relative;z-index:1;">
+  <div class="page-content section-top" id="dreams-list" style="position:relative;z-index:1;width:100%;">
     <div class="dreams-card">
       <div style="color:#8090AA;font-size:14px;text-align:center;padding:8px 0;">Запиши свой первый сон. Нажми + чтобы начать.</div>
     </div>
