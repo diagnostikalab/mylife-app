@@ -1,0 +1,2024 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" content="#5B9E96">
+<title>MyLife</title>
+<link rel="manifest" href="manifest.json">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Lora:ital,wght@0,400;0,600;1,400&display=swap" rel="stylesheet">
+<style>
+/* ===== TOKENS ===== */
+:root {
+  --bg: #F5F3EF;
+  --bg2: #EDEAE4;
+  --card: #FFFFFF;
+  --text: #1C1C1E;
+  --text2: #6B7A8D;
+  --teal: #5B9E96;
+  --teal-light: #EAF4F3;
+  --rose: #D4927A;
+  --rose-light: #FAF0EC;
+  --gold: #C9A96E;
+  --gold-light: #FBF6ED;
+  --border: #E5E1DA;
+  --radius: 16px;
+  --radius-sm: 10px;
+  --shadow: 0 2px 12px rgba(0,0,0,0.07);
+  --nav-h: 72px;
+  --safe-bottom: env(safe-area-inset-bottom, 0px);
+}
+
+/* ===== RESET ===== */
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { font-size: 16px; -webkit-text-size-adjust: 100%; }
+body {
+  font-family: 'Inter', -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--text);
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+button { font-family: inherit; cursor: pointer; border: none; background: none; }
+input, textarea, select { font-family: inherit; font-size: 16px; }
+a { color: inherit; text-decoration: none; }
+
+/* ===== LAYOUT ===== */
+.page {
+  display: none;
+  min-height: 100vh;
+  padding-bottom: calc(var(--nav-h) + var(--safe-bottom) + 16px);
+}
+.page.active { display: block; }
+.page-content { padding: 0 16px; max-width: 480px; margin: 0 auto; }
+
+/* Dreams page dark theme */
+.page.dreams-theme {
+  background: #0F1520;
+  color: #E8E4DC;
+}
+
+/* ===== TOP HEADER ===== */
+.top-bar {
+  position: sticky; top: 0; z-index: 10;
+  background: var(--bg);
+  padding: 16px 16px 12px;
+  border-bottom: 1px solid var(--border);
+}
+.top-bar h1 {
+  font-family: 'Lora', serif;
+  font-size: 22px;
+  font-weight: 600;
+  color: var(--text);
+}
+.top-bar .date-sub {
+  font-size: 13px;
+  color: var(--text2);
+  margin-top: 2px;
+}
+
+.dreams-theme .top-bar {
+  background: #0F1520;
+  border-bottom: 1px solid #2A3347;
+}
+.dreams-theme .top-bar h1 { color: #E8E4DC; }
+.dreams-theme .top-bar .date-sub { color: #8090AA; }
+
+/* ===== BOTTOM NAV ===== */
+.bottom-nav {
+  position: fixed;
+  bottom: 0; left: 0; right: 0;
+  height: calc(var(--nav-h) + var(--safe-bottom));
+  background: var(--card);
+  border-top: 1px solid var(--border);
+  display: flex;
+  align-items: flex-start;
+  padding-top: 8px;
+  z-index: 100;
+}
+.nav-item {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  padding: 6px 4px;
+  border-radius: 12px;
+  transition: opacity 0.15s;
+  opacity: 0.45;
+}
+.nav-item.active { opacity: 1; }
+.nav-item svg { width: 24px; height: 24px; stroke: var(--text); fill: none; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; }
+.nav-item.active svg { stroke: var(--teal); }
+.nav-item span { font-size: 10px; color: var(--text); }
+.nav-item.active span { color: var(--teal); font-weight: 500; }
+
+/* ===== CARDS ===== */
+.card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 600;
+  color: var(--text2);
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  margin-bottom: 12px;
+}
+
+/* ===== FORM ELEMENTS ===== */
+.field { margin-bottom: 14px; }
+.field label {
+  display: block;
+  font-size: 13px;
+  font-weight: 500;
+  color: var(--text2);
+  margin-bottom: 6px;
+}
+.field input[type="text"],
+.field input[type="number"],
+.field input[type="time"],
+.field input[type="date"],
+.field textarea,
+.field select {
+  width: 100%;
+  padding: 12px 14px;
+  background: var(--bg);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-sm);
+  color: var(--text);
+  outline: none;
+  transition: border-color 0.15s;
+  -webkit-appearance: none;
+}
+.field input:focus,
+.field textarea:focus,
+.field select:focus {
+  border-color: var(--teal);
+}
+.field textarea { resize: vertical; min-height: 80px; line-height: 1.5; }
+
+/* Dreams dark inputs */
+.dreams-theme .field input,
+.dreams-theme .field textarea,
+.dreams-theme .field select {
+  background: #1A2235;
+  border-color: #2A3347;
+  color: #E8E4DC;
+}
+
+/* ===== SLIDER RATING ===== */
+.rating-row { display: flex; gap: 6px; }
+.rating-btn {
+  flex: 1; padding: 10px 4px;
+  border-radius: 8px;
+  border: 1.5px solid var(--border);
+  font-size: 13px; font-weight: 500;
+  color: var(--text2);
+  background: var(--bg);
+  transition: all 0.15s;
+  text-align: center;
+}
+.rating-btn.selected {
+  border-color: var(--teal);
+  background: var(--teal-light);
+  color: var(--teal);
+}
+
+/* ===== TOGGLE ===== */
+.toggle-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.toggle-row:last-child { border-bottom: none; }
+.toggle-label { font-size: 15px; }
+.toggle-sub { font-size: 12px; color: var(--text2); margin-top: 2px; }
+.toggle {
+  position: relative; width: 44px; height: 26px;
+  flex-shrink: 0;
+}
+.toggle input { opacity: 0; width: 0; height: 0; }
+.toggle-track {
+  position: absolute; inset: 0;
+  background: var(--border);
+  border-radius: 13px;
+  transition: background 0.2s;
+  cursor: pointer;
+}
+.toggle input:checked + .toggle-track { background: var(--teal); }
+.toggle-track::after {
+  content: '';
+  position: absolute;
+  width: 20px; height: 20px;
+  background: white;
+  border-radius: 50%;
+  top: 3px; left: 3px;
+  transition: transform 0.2s;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.2);
+}
+.toggle input:checked + .toggle-track::after { transform: translateX(18px); }
+
+/* ===== CHIPS ===== */
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip {
+  padding: 7px 14px;
+  border-radius: 20px;
+  border: 1.5px solid var(--border);
+  font-size: 13px;
+  color: var(--text2);
+  background: var(--bg);
+  cursor: pointer;
+  transition: all 0.15s;
+}
+.chip.selected {
+  border-color: var(--teal);
+  background: var(--teal-light);
+  color: var(--teal);
+}
+
+/* ===== BTN ===== */
+.btn {
+  display: block; width: 100%;
+  padding: 14px;
+  border-radius: var(--radius-sm);
+  font-size: 15px; font-weight: 600;
+  text-align: center;
+  transition: opacity 0.15s;
+}
+.btn:active { opacity: 0.8; }
+.btn-primary { background: var(--teal); color: white; }
+.btn-ghost { border: 1.5px solid var(--border); color: var(--text2); }
+.btn-rose { background: var(--rose); color: white; }
+
+/* ===== TODAY PAGE ===== */
+.today-greeting {
+  padding: 20px 16px 8px;
+}
+.greeting-text {
+  font-family: 'Lora', serif;
+  font-size: 26px;
+  line-height: 1.25;
+  color: var(--text);
+}
+.greeting-date {
+  font-size: 14px;
+  color: var(--text2);
+  margin-top: 4px;
+}
+
+.quick-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 10px;
+  margin-bottom: 12px;
+}
+.quick-card {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.quick-card:active { transform: scale(0.97); }
+.quick-card .qc-icon { font-size: 22px; margin-bottom: 6px; }
+.quick-card .qc-label { font-size: 12px; color: var(--text2); }
+.quick-card .qc-val { font-size: 20px; font-weight: 600; color: var(--text); }
+
+/* ===== HABITS ===== */
+.habit-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.habit-item:last-child { border-bottom: none; }
+.habit-check {
+  width: 24px; height: 24px; border-radius: 6px;
+  border: 2px solid var(--border);
+  flex-shrink: 0; cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: all 0.15s;
+}
+.habit-check.checked {
+  background: var(--teal);
+  border-color: var(--teal);
+}
+.habit-check.checked::after {
+  content: '';
+  width: 6px; height: 10px;
+  border-right: 2px solid white;
+  border-bottom: 2px solid white;
+  transform: rotate(45deg) translate(-1px, -1px);
+}
+.habit-name { flex: 1; font-size: 15px; }
+.habit-streak { font-size: 12px; color: var(--rose); font-weight: 600; }
+
+/* ===== DIARY ===== */
+.diary-entry {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  box-shadow: var(--shadow);
+  cursor: pointer;
+}
+.entry-date { font-size: 12px; color: var(--text2); margin-bottom: 6px; }
+.entry-text { font-size: 15px; line-height: 1.6; color: var(--text); }
+.entry-mood { display: inline-block; margin-top: 8px; font-size: 12px; color: var(--teal); }
+.entry-media { display: flex; gap: 6px; margin-top: 10px; flex-wrap: wrap; }
+.media-thumb {
+  width: 60px; height: 60px; border-radius: 8px;
+  object-fit: cover; background: var(--bg2);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 20px;
+}
+
+/* ===== DREAMS PAGE ===== */
+.dreams-card {
+  background: #1A2235;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #2A3347;
+}
+.dreams-card .card-title { color: #8090AA; }
+
+.stars-bg {
+  position: fixed; top: 0; left: 0; right: 0; height: 200px;
+  background: radial-gradient(ellipse at 50% 0%, #1A2B50 0%, #0F1520 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+
+.dream-entry {
+  background: #1A2235;
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 12px;
+  border: 1px solid #2A3347;
+  cursor: pointer;
+}
+.dream-entry .entry-date { color: #8090AA; }
+.dream-entry .entry-text { color: #E8E4DC; font-family: 'Lora', serif; line-height: 1.7; }
+.dream-tag {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 12px;
+  background: #2A3347;
+  color: #8090AA;
+  font-size: 12px;
+  margin: 4px 4px 0 0;
+}
+.dream-tag.lucid { background: #2A3B5E; color: #7BAFD4; }
+
+/* ===== NOTES ===== */
+.note-item {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 16px;
+  margin-bottom: 10px;
+  box-shadow: var(--shadow);
+  border-left: 3px solid var(--gold);
+}
+.note-text {
+  font-family: 'Lora', serif;
+  font-style: italic;
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--text);
+  margin-bottom: 8px;
+}
+.note-source { font-size: 12px; color: var(--text2); }
+.note-tags { margin-top: 8px; }
+
+/* ===== FINANCES ===== */
+.fin-summary {
+  display: grid; grid-template-columns: 1fr 1fr;
+  gap: 10px; margin-bottom: 12px;
+}
+.fin-box {
+  background: var(--card);
+  border-radius: var(--radius);
+  padding: 14px;
+  box-shadow: var(--shadow);
+}
+.fin-box .fb-label { font-size: 12px; color: var(--text2); margin-bottom: 4px; }
+.fin-box .fb-val { font-size: 22px; font-weight: 600; }
+.fb-income .fb-val { color: var(--teal); }
+.fb-expense .fb-val { color: var(--rose); }
+
+.tx-item {
+  display: flex; align-items: center; gap: 12px;
+  padding: 12px 0;
+  border-bottom: 1px solid var(--border);
+}
+.tx-icon {
+  width: 38px; height: 38px; border-radius: 10px;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 18px; flex-shrink: 0;
+}
+.tx-info { flex: 1; }
+.tx-name { font-size: 14px; font-weight: 500; }
+.tx-cat { font-size: 12px; color: var(--text2); }
+.tx-amount { font-size: 15px; font-weight: 600; }
+.tx-item.income .tx-amount { color: var(--teal); }
+.tx-item.expense .tx-amount { color: var(--rose); }
+
+/* ===== BODY METRICS ===== */
+.metric-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.metric-row:last-child { border-bottom: none; }
+.metric-label { font-size: 14px; }
+.metric-val { font-size: 16px; font-weight: 600; color: var(--teal); }
+
+/* ===== ANALYTICS ===== */
+.stat-row {
+  display: flex; align-items: center;
+  justify-content: space-between;
+  padding: 10px 0;
+  border-bottom: 1px solid var(--border);
+}
+.stat-row:last-child { border-bottom: none; }
+.stat-label { font-size: 14px; color: var(--text2); }
+.stat-val { font-size: 15px; font-weight: 600; }
+
+.bar-chart { margin: 8px 0; }
+.bar-row { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
+.bar-label { font-size: 12px; color: var(--text2); width: 32px; text-align: right; }
+.bar-track { flex: 1; height: 8px; background: var(--bg2); border-radius: 4px; overflow: hidden; }
+.bar-fill { height: 100%; background: var(--teal); border-radius: 4px; transition: width 0.6s ease; }
+.bar-val { font-size: 12px; color: var(--text2); width: 28px; }
+
+/* ===== MODAL ===== */
+.modal-overlay {
+  display: none; position: fixed; inset: 0;
+  background: rgba(0,0,0,0.45);
+  z-index: 200; align-items: flex-end;
+}
+.modal-overlay.open { display: flex; }
+.modal {
+  background: var(--card);
+  border-radius: 24px 24px 0 0;
+  width: 100%; max-height: 92vh;
+  overflow-y: auto;
+  padding: 20px 16px 32px;
+  animation: slideUp 0.3s ease;
+}
+@keyframes slideUp {
+  from { transform: translateY(100%); }
+  to { transform: translateY(0); }
+}
+.modal-handle {
+  width: 36px; height: 4px;
+  background: var(--border);
+  border-radius: 2px;
+  margin: 0 auto 20px;
+}
+.modal-title {
+  font-size: 18px; font-weight: 600;
+  margin-bottom: 20px;
+}
+.modal-actions {
+  display: flex; gap: 10px; margin-top: 20px;
+}
+.modal-actions .btn { flex: 1; }
+
+/* ===== TOAST ===== */
+.toast {
+  position: fixed; bottom: calc(var(--nav-h) + 12px); left: 16px; right: 16px;
+  background: var(--text);
+  color: white; padding: 14px 16px;
+  border-radius: 12px; font-size: 14px;
+  z-index: 300; text-align: center;
+  transform: translateY(20px); opacity: 0;
+  transition: all 0.3s; pointer-events: none;
+}
+.toast.show { transform: translateY(0); opacity: 1; }
+
+/* ===== ADD FAB ===== */
+.fab {
+  position: fixed;
+  bottom: calc(var(--nav-h) + var(--safe-bottom) + 12px);
+  right: 16px;
+  width: 52px; height: 52px;
+  border-radius: 50%;
+  background: var(--teal);
+  color: white;
+  font-size: 26px;
+  display: flex; align-items: center; justify-content: center;
+  box-shadow: 0 4px 16px rgba(91,158,150,0.45);
+  z-index: 50;
+  cursor: pointer;
+  transition: transform 0.1s;
+}
+.fab:active { transform: scale(0.92); }
+
+/* ===== SECTION SPACER ===== */
+.section-top { padding-top: 16px; }
+
+/* ===== PROGRESS RING ===== */
+.progress-wrap {
+  display: flex; gap: 12px; align-items: center;
+  padding: 4px 0 8px;
+}
+.progress-ring-svg { transform: rotate(-90deg); }
+.progress-ring-bg { fill: none; stroke: var(--bg2); stroke-width: 4; }
+.progress-ring-fill { fill: none; stroke: var(--teal); stroke-width: 4; stroke-linecap: round; transition: stroke-dashoffset 0.6s ease; }
+.progress-info .pi-val { font-size: 22px; font-weight: 700; }
+.progress-info .pi-label { font-size: 13px; color: var(--text2); }
+
+/* ===== SCROLL ===== */
+::-webkit-scrollbar { width: 0; }
+</style>
+</head>
+<body>
+
+<!-- ===== PAGES ===== -->
+
+<!-- TODAY -->
+<div class="page active" id="page-today">
+  <div class="today-greeting page-content">
+    <div class="greeting-text" id="greeting-text">Добрый вечер</div>
+    <div class="greeting-date" id="greeting-date"></div>
+  </div>
+  <div class="page-content section-top">
+    <div class="quick-grid">
+      <div class="quick-card" onclick="nav('tracker')">
+        <div class="qc-icon">🌙</div>
+        <div class="qc-label">Сон</div>
+        <div class="qc-val" id="today-sleep">--</div>
+      </div>
+      <div class="quick-card" onclick="nav('tracker')">
+        <div class="qc-icon">👣</div>
+        <div class="qc-label">Шаги</div>
+        <div class="qc-val" id="today-steps">--</div>
+      </div>
+      <div class="quick-card" onclick="nav('tracker')">
+        <div class="qc-icon">💧</div>
+        <div class="qc-label">Вода</div>
+        <div class="qc-val" id="today-water">--</div>
+      </div>
+      <div class="quick-card" onclick="nav('habits')">
+        <div class="qc-icon">✅</div>
+        <div class="qc-label">Привычки</div>
+        <div class="qc-val" id="today-habits">0/0</div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Настроение сегодня</div>
+      <div class="rating-row" id="mood-today">
+        <button class="rating-btn" onclick="setMoodToday(1)">😞</button>
+        <button class="rating-btn" onclick="setMoodToday(2)">😕</button>
+        <button class="rating-btn" onclick="setMoodToday(3)">😐</button>
+        <button class="rating-btn" onclick="setMoodToday(4)">🙂</button>
+        <button class="rating-btn" onclick="setMoodToday(5)">😊</button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Быстрые действия</div>
+      <div style="display:flex;flex-direction:column;gap:8px;">
+        <button class="btn btn-primary" onclick="nav('tracker')">Заполнить трекер дня</button>
+        <button class="btn btn-ghost" onclick="openDiaryNew()">Написать в дневник</button>
+        <button class="btn btn-ghost" onclick="nav('dreams'); openDreamNew()">Записать сон</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TRACKER -->
+<div class="page" id="page-tracker">
+  <div class="top-bar">
+    <h1>Трекер дня</h1>
+    <div class="date-sub" id="tracker-date-label"></div>
+  </div>
+  <div class="page-content section-top" id="tracker-form">
+
+    <div class="card">
+      <div class="card-title">🌙 Сон</div>
+      <div class="field">
+        <label>Продолжительность (часов)</label>
+        <input type="number" id="tr-sleep-h" placeholder="7.5" step="0.5" min="0" max="24">
+      </div>
+      <div class="field">
+        <label>Качество сна</label>
+        <div class="rating-row" id="sleep-q-row">
+          <button class="rating-btn" onclick="selectRating('sleep-q',1,'sleep-q-row')">1</button>
+          <button class="rating-btn" onclick="selectRating('sleep-q',2,'sleep-q-row')">2</button>
+          <button class="rating-btn" onclick="selectRating('sleep-q',3,'sleep-q-row')">3</button>
+          <button class="rating-btn" onclick="selectRating('sleep-q',4,'sleep-q-row')">4</button>
+          <button class="rating-btn" onclick="selectRating('sleep-q',5,'sleep-q-row')">5</button>
+        </div>
+      </div>
+      <div style="display:flex;gap:10px;">
+        <div class="field" style="flex:1"><label>Заснула</label><input type="time" id="tr-sleep-start"></div>
+        <div class="field" style="flex:1"><label>Проснулась</label><input type="time" id="tr-sleep-end"></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💧 Физические показатели</div>
+      <div class="field">
+        <label>Шаги</label>
+        <input type="number" id="tr-steps" placeholder="8500">
+      </div>
+      <div class="field">
+        <label>Вода (мл)</label>
+        <input type="number" id="tr-water" placeholder="2000" step="100">
+      </div>
+      <div class="field">
+        <label>Кофеин (порций)</label>
+        <input type="number" id="tr-caffeine" placeholder="1" min="0">
+      </div>
+      <div class="field">
+        <label>Алкоголь</label>
+        <div style="display:flex;gap:8px;">
+          <input type="number" id="tr-alcohol-qty" placeholder="0 порц." min="0" style="flex:1">
+          <select id="tr-alcohol-type" style="flex:1.5;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;">
+            <option value="">Тип</option>
+            <option>Вино</option>
+            <option>Пиво</option>
+            <option>Крепкое</option>
+            <option>Игристое</option>
+            <option>Другое</option>
+          </select>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">😊 Самочувствие</div>
+      <div class="field">
+        <label>Настроение</label>
+        <div class="rating-row" id="mood-row">
+          <button class="rating-btn" onclick="selectRating('mood',1,'mood-row')">1</button>
+          <button class="rating-btn" onclick="selectRating('mood',2,'mood-row')">2</button>
+          <button class="rating-btn" onclick="selectRating('mood',3,'mood-row')">3</button>
+          <button class="rating-btn" onclick="selectRating('mood',4,'mood-row')">4</button>
+          <button class="rating-btn" onclick="selectRating('mood',5,'mood-row')">5</button>
+          <button class="rating-btn" onclick="selectRating('mood',6,'mood-row')">6</button>
+          <button class="rating-btn" onclick="selectRating('mood',7,'mood-row')">7</button>
+          <button class="rating-btn" onclick="selectRating('mood',8,'mood-row')">8</button>
+          <button class="rating-btn" onclick="selectRating('mood',9,'mood-row')">9</button>
+          <button class="rating-btn" onclick="selectRating('mood',10,'mood-row')">10</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Уровень энергии</label>
+        <div class="rating-row" id="energy-row">
+          <button class="rating-btn" onclick="selectRating('energy',1,'energy-row')">1</button>
+          <button class="rating-btn" onclick="selectRating('energy',2,'energy-row')">2</button>
+          <button class="rating-btn" onclick="selectRating('energy',3,'energy-row')">3</button>
+          <button class="rating-btn" onclick="selectRating('energy',4,'energy-row')">4</button>
+          <button class="rating-btn" onclick="selectRating('energy',5,'energy-row')">5</button>
+          <button class="rating-btn" onclick="selectRating('energy',6,'energy-row')">6</button>
+          <button class="rating-btn" onclick="selectRating('energy',7,'energy-row')">7</button>
+          <button class="rating-btn" onclick="selectRating('energy',8,'energy-row')">8</button>
+          <button class="rating-btn" onclick="selectRating('energy',9,'energy-row')">9</button>
+          <button class="rating-btn" onclick="selectRating('energy',10,'energy-row')">10</button>
+        </div>
+      </div>
+      <div class="field">
+        <label>Боль / дискомфорт</label>
+        <input type="text" id="tr-pain" placeholder="Нет или опиши где и насколько (1-10)">
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🍎 Питание</div>
+      <div class="field">
+        <label>Общая характеристика дня</label>
+        <textarea id="tr-nutrition" placeholder="Ел(а) хорошо, много овощей, мало сахара..."></textarea>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">💊 Лекарства и добавки</div>
+      <div id="meds-list"></div>
+      <button class="btn btn-ghost" onclick="addMed()" style="margin-top:8px;">+ Добавить</button>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚴 Тренировка</div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Была тренировка</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tr-workout-toggle" onchange="toggleWorkout(this)">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div id="workout-details" style="display:none; margin-top:12px;">
+        <div class="field">
+          <label>Вид тренировки</label>
+          <div class="chips" id="workout-chips">
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Кардио</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Силовая</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Йога</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Растяжка</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Бег</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Плавание</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Пилатес</button>
+            <button class="chip" onclick="toggleChip(this,'workout-type')">Другое</button>
+          </div>
+        </div>
+        <div class="field">
+          <label>Продолжительность (мин)</label>
+          <input type="number" id="tr-workout-dur" placeholder="45">
+        </div>
+        <div class="field">
+          <label>Заметки о тренировке</label>
+          <textarea id="tr-workout-note" placeholder="Как прошло, что делала..."></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🧘 Практики</div>
+      <div class="toggle-row">
+        <div class="toggle-label">Медитация / духовная практика</div>
+        <label class="toggle">
+          <input type="checkbox" id="tr-meditation">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div class="toggle-label">Половой контакт</div>
+        <label class="toggle">
+          <input type="checkbox" id="tr-sex">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+      <div class="toggle-row">
+        <div>
+          <div class="toggle-label">Осознанное сновидение</div>
+          <div class="toggle-sub">Было прошлой ночью</div>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="tr-lucid">
+          <span class="toggle-track"></span>
+        </label>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🌸 Цикл</div>
+      <div class="field">
+        <label>День цикла</label>
+        <input type="number" id="tr-cycle-day" placeholder="1" min="1" max="40">
+      </div>
+      <div class="field">
+        <label>Характер выделений</label>
+        <div class="chips">
+          <button class="chip" onclick="toggleChip(this,'discharge')">Нет</button>
+          <button class="chip" onclick="toggleChip(this,'discharge')">Скудные</button>
+          <button class="chip" onclick="toggleChip(this,'discharge')">Умеренные</button>
+          <button class="chip" onclick="toggleChip(this,'discharge')">Обильные</button>
+          <button class="chip" onclick="toggleChip(this,'discharge')">Сгустки</button>
+          <button class="chip" onclick="toggleChip(this,'discharge')">Слизистые</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🚽 Стул (Бристольская шкала)</div>
+      <div class="field">
+        <div class="chips" style="flex-direction:column;gap:6px;" id="bristol-chips">
+          <button class="chip" onclick="selectBristol(this,1)" style="text-align:left;">Тип 1: отдельные твердые комочки</button>
+          <button class="chip" onclick="selectBristol(this,2)" style="text-align:left;">Тип 2: колбасовидный, комковатый</button>
+          <button class="chip" onclick="selectBristol(this,3)" style="text-align:left;">Тип 3: колбасовидный с трещинами</button>
+          <button class="chip" onclick="selectBristol(this,4)" style="text-align:left;">Тип 4: гладкий мягкий</button>
+          <button class="chip" onclick="selectBristol(this,5)" style="text-align:left;">Тип 5: мягкие комочки с ровными краями</button>
+          <button class="chip" onclick="selectBristol(this,6)" style="text-align:left;">Тип 6: рыхлый, неоформленный</button>
+          <button class="chip" onclick="selectBristol(this,7)" style="text-align:left;">Тип 7: жидкий, без комочков</button>
+          <button class="chip" onclick="selectBristol(this,8)" style="text-align:left;">Не было</button>
+        </div>
+      </div>
+    </div>
+
+    <button class="btn btn-primary" onclick="saveTracker()" style="margin-bottom:16px;">Сохранить день</button>
+  </div>
+</div>
+
+<!-- HABITS -->
+<div class="page" id="page-habits">
+  <div class="top-bar">
+    <h1>Привычки</h1>
+    <div class="date-sub" id="habits-month-label"></div>
+  </div>
+  <div class="page-content section-top">
+    <div class="card" id="habits-list-card">
+      <div class="card-title">Сегодня</div>
+      <div id="habits-list">
+        <div style="color:var(--text2);font-size:14px;padding:8px 0;">Привычки не добавлены. Нажми + чтобы добавить.</div>
+      </div>
+    </div>
+    <div class="card" id="habits-calendar-card" style="display:none;">
+      <div class="card-title">Выполнение за месяц</div>
+      <div id="habits-calendar"></div>
+    </div>
+  </div>
+  <div class="fab" onclick="openHabitModal()">+</div>
+</div>
+
+<!-- DIARY -->
+<div class="page" id="page-diary">
+  <div class="top-bar">
+    <h1>Дневник</h1>
+    <div class="date-sub">Только для тебя</div>
+  </div>
+  <div class="page-content section-top" id="diary-list">
+    <div style="color:var(--text2);font-size:14px;padding:8px 0; background:var(--card); border-radius:var(--radius); padding:16px; text-align:center;">
+      Здесь появятся твои записи. Нажми + чтобы написать.
+    </div>
+  </div>
+  <div class="fab" onclick="openDiaryNew()">+</div>
+</div>
+
+<!-- DREAMS -->
+<div class="page dreams-theme" id="page-dreams">
+  <div class="stars-bg"></div>
+  <div class="top-bar">
+    <h1>Сновидения</h1>
+    <div class="date-sub">Мир за закрытыми глазами</div>
+  </div>
+  <div class="page-content section-top" id="dreams-list" style="position:relative;z-index:1;">
+    <div class="dreams-card">
+      <div style="color:#8090AA;font-size:14px;text-align:center;padding:8px 0;">Запиши свой первый сон. Нажми + чтобы начать.</div>
+    </div>
+  </div>
+  <div class="fab" style="background:#2A3B5E;box-shadow:0 4px 16px rgba(40,60,100,0.5);" onclick="openDreamNew()">+</div>
+</div>
+
+<!-- NOTES -->
+<div class="page" id="page-notes">
+  <div class="top-bar">
+    <h1>Заметки</h1>
+    <div class="date-sub">Цитаты, мысли, кусочки из книг</div>
+  </div>
+  <div class="page-content section-top" id="notes-list">
+    <div style="color:var(--text2);font-size:14px;background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;">
+      Сохраняй цитаты и важные мысли. Нажми + чтобы добавить.
+    </div>
+  </div>
+  <div class="fab" onclick="openNoteNew()">+</div>
+</div>
+
+<!-- FINANCES -->
+<div class="page" id="page-finances">
+  <div class="top-bar">
+    <h1>Финансы</h1>
+    <div class="date-sub" id="fin-month-label"></div>
+  </div>
+  <div class="page-content section-top">
+    <div class="fin-summary">
+      <div class="fin-box fb-income">
+        <div class="fb-label">Доход</div>
+        <div class="fb-val" id="fin-income">0</div>
+      </div>
+      <div class="fin-box fb-expense">
+        <div class="fb-label">Расход</div>
+        <div class="fb-val" id="fin-expense">0</div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-title">Транзакции</div>
+      <div id="tx-list">
+        <div style="color:var(--text2);font-size:14px;padding:8px 0;">Нет записей в этом месяце.</div>
+      </div>
+    </div>
+  </div>
+  <div class="fab" onclick="openFinModal()">+</div>
+</div>
+
+<!-- BODY -->
+<div class="page" id="page-body">
+  <div class="top-bar">
+    <h1>Тело</h1>
+    <div class="date-sub">Вес, замеры, фото</div>
+  </div>
+  <div class="page-content section-top">
+    <div class="card">
+      <div class="card-title">Последние замеры</div>
+      <div class="metric-row"><span class="metric-label">Вес</span><span class="metric-val" id="body-weight">-- кг</span></div>
+      <div class="metric-row"><span class="metric-label">Грудь</span><span class="metric-val" id="body-chest">-- см</span></div>
+      <div class="metric-row"><span class="metric-label">Талия</span><span class="metric-val" id="body-waist">-- см</span></div>
+      <div class="metric-row"><span class="metric-label">Бедра</span><span class="metric-val" id="body-hips">-- см</span></div>
+    </div>
+    <div class="card" id="body-photos-card">
+      <div class="card-title">Фото прогресса</div>
+      <div id="body-photos" style="display:flex;flex-wrap:wrap;gap:8px;margin-bottom:10px;"></div>
+      <label style="display:block;">
+        <div class="btn btn-ghost">Добавить фото</div>
+        <input type="file" accept="image/*" style="display:none;" onchange="addBodyPhoto(this)">
+      </label>
+    </div>
+    <button class="btn btn-primary" onclick="openBodyModal()">Добавить замеры</button>
+  </div>
+</div>
+
+<!-- ANALYTICS -->
+<div class="page" id="page-analytics">
+  <div class="top-bar">
+    <h1>Аналитика</h1>
+    <div class="date-sub">Паттерны и связи</div>
+  </div>
+  <div class="page-content section-top">
+    <div class="card">
+      <div class="card-title">Период</div>
+      <div class="chips">
+        <button class="chip selected" onclick="setPeriod(14,this)">2 недели</button>
+        <button class="chip" onclick="setPeriod(30,this)">Месяц</button>
+        <button class="chip" onclick="setPeriod(90,this)">3 месяца</button>
+        <button class="chip" onclick="setPeriod(180,this)">Полгода</button>
+      </div>
+    </div>
+    <div class="card" id="analytics-stats">
+      <div class="card-title">Средние показатели</div>
+      <div id="stats-content">
+        <div style="color:var(--text2);font-size:14px;padding:8px 0;">Заполни трекер хотя бы несколько дней, чтобы увидеть статистику.</div>
+      </div>
+    </div>
+    <div class="card" id="analytics-mood-chart">
+      <div class="card-title">Настроение по дням</div>
+      <div id="mood-chart" class="bar-chart"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Глубокий анализ через ИИ</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:12px;line-height:1.5;">
+        Раз в период можно отправить данные для поиска корреляций. Данные уйдут в Anthropic API только сейчас, по твоему нажатию.
+      </div>
+      <button class="btn btn-primary" onclick="runAIAnalysis()">Запустить анализ</button>
+      <div id="ai-analysis-result" style="margin-top:14px;font-size:14px;line-height:1.6;display:none;"></div>
+    </div>
+    <div class="card">
+      <div class="card-title">Резервная копия</div>
+      <div style="font-size:14px;color:var(--text2);margin-bottom:12px;">Экспортируй все данные в файл для резервной копии.</div>
+      <button class="btn btn-ghost" onclick="exportData()">Экспортировать данные</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BOTTOM NAV ===== -->
+<nav class="bottom-nav">
+  <button class="nav-item active" onclick="nav('today')" id="nav-today">
+    <svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+    <span>Сегодня</span>
+  </button>
+  <button class="nav-item" onclick="nav('tracker')" id="nav-tracker">
+    <svg viewBox="0 0 24 24"><rect x="3" y="3" width="18" height="18" rx="4"/><path d="M9 12h6M12 9v6"/></svg>
+    <span>Трекер</span>
+  </button>
+  <button class="nav-item" onclick="nav('habits')" id="nav-habits">
+    <svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 01-2 2H5a2 2 0 01-2-2V5a2 2 0 012-2h11"/></svg>
+    <span>Привычки</span>
+  </button>
+  <button class="nav-item" onclick="nav('diary')" id="nav-diary">
+    <svg viewBox="0 0 24 24"><path d="M12 20h9"/><path d="M16.5 3.5a2.121 2.121 0 013 3L7 19l-4 1 1-4L16.5 3.5z"/></svg>
+    <span>Дневник</span>
+  </button>
+  <button class="nav-item" onclick="nav('dreams')" id="nav-dreams">
+    <svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg>
+    <span>Сны</span>
+  </button>
+  <button class="nav-item" onclick="openMoreMenu()" id="nav-more">
+    <svg viewBox="0 0 24 24"><circle cx="5" cy="12" r="1.5"/><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/></svg>
+    <span>Ещё</span>
+  </button>
+</nav>
+
+<!-- ===== MODALS ===== -->
+
+<!-- More Menu -->
+<div class="modal-overlay" id="modal-more" onclick="closeModal('modal-more')">
+  <div class="modal" onclick="e=>e.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button class="btn btn-ghost" onclick="closeModal('modal-more');nav('notes')">📝 Заметки и цитаты</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-more');nav('finances')">💰 Финансы</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-more');nav('body')">📏 Замеры тела</button>
+      <button class="btn btn-ghost" onclick="closeModal('modal-more');nav('analytics')">📊 Аналитика</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Diary Entry -->
+<div class="modal-overlay" id="modal-diary">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Запись в дневник</div>
+    <div class="field">
+      <label>Дата</label>
+      <input type="date" id="diary-date">
+    </div>
+    <div class="field">
+      <label>Запись</label>
+      <textarea id="diary-text" placeholder="Что сегодня было важным..." style="min-height:140px;"></textarea>
+    </div>
+    <div class="field">
+      <label>Настроение</label>
+      <div class="rating-row" id="diary-mood-row">
+        <button class="rating-btn" onclick="selectRating('diary-mood',1,'diary-mood-row')">😞</button>
+        <button class="rating-btn" onclick="selectRating('diary-mood',2,'diary-mood-row')">😕</button>
+        <button class="rating-btn" onclick="selectRating('diary-mood',3,'diary-mood-row')">😐</button>
+        <button class="rating-btn" onclick="selectRating('diary-mood',4,'diary-mood-row')">🙂</button>
+        <button class="rating-btn" onclick="selectRating('diary-mood',5,'diary-mood-row')">😊</button>
+      </div>
+    </div>
+    <div class="field">
+      <label>Медиа (фото / видео / аудио)</label>
+      <label style="display:block;cursor:pointer;">
+        <div class="btn btn-ghost">Прикрепить файлы</div>
+        <input type="file" id="diary-media" multiple accept="image/*,video/*,audio/*" style="display:none;" onchange="previewDiaryMedia(this)">
+      </label>
+      <div id="diary-media-preview" style="display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;"></div>
+    </div>
+    <div class="field">
+      <label>Теги (через запятую)</label>
+      <input type="text" id="diary-tags" placeholder="работа, отдых, важное">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-diary')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveDiary()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Dream -->
+<div class="modal-overlay" id="modal-dream">
+  <div class="modal" onclick="event.stopPropagation()" style="background:#1A2235;color:#E8E4DC;">
+    <div class="modal-handle" style="background:#2A3347;"></div>
+    <div class="modal-title" style="color:#E8E4DC;">Записать сон</div>
+    <div class="field">
+      <label style="color:#8090AA;">Дата сна (утро)</label>
+      <input type="date" id="dream-date" style="background:#0F1520;border-color:#2A3347;color:#E8E4DC;">
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Описание сна</label>
+      <textarea id="dream-text" placeholder="Мне снилось..." style="min-height:140px;background:#0F1520;border-color:#2A3347;color:#E8E4DC;font-family:'Lora',serif;line-height:1.7;"></textarea>
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Ощущение от сна</label>
+      <div class="chips">
+        <button class="chip" onclick="toggleChip(this,'dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Приятный</button>
+        <button class="chip" onclick="toggleChip(this,'dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Тревожный</button>
+        <button class="chip" onclick="toggleChip(this,'dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Нейтральный</button>
+        <button class="chip" onclick="toggleChip(this,'dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Яркий</button>
+        <button class="chip" onclick="toggleChip(this,'dream-feel')" style="background:#0F1520;border-color:#2A3347;color:#8090AA;">Странный</button>
+      </div>
+    </div>
+    <div class="field">
+      <label style="color:#8090AA;">Теги</label>
+      <input type="text" id="dream-tags" placeholder="полёт, вода, знакомые..." style="background:#0F1520;border-color:#2A3347;color:#E8E4DC;">
+    </div>
+    <div class="field">
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:6px 0;">
+        <span style="font-size:15px;color:#E8E4DC;">Осознанное сновидение</span>
+        <label class="toggle">
+          <input type="checkbox" id="dream-lucid">
+          <span class="toggle-track" style="background:#2A3347;"></span>
+        </label>
+      </div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" onclick="closeModal('modal-dream')" style="border:1.5px solid #2A3347;color:#8090AA;">Отмена</button>
+      <button class="btn" onclick="saveDream()" style="background:#2A3B5E;color:#7BAFD4;font-weight:600;">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Note -->
+<div class="modal-overlay" id="modal-note">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Новая заметка</div>
+    <div class="field">
+      <label>Текст / цитата</label>
+      <textarea id="note-text" placeholder="«...»" style="min-height:120px;font-family:'Lora',serif;font-style:italic;"></textarea>
+    </div>
+    <div class="field">
+      <label>Источник (автор, книга)</label>
+      <input type="text" id="note-source" placeholder="Автор / Книга">
+    </div>
+    <div class="field">
+      <label>Теги</label>
+      <input type="text" id="note-tags" placeholder="мудрость, здоровье, любовь...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-note')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveNote()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Habit -->
+<div class="modal-overlay" id="modal-habit">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Новая привычка</div>
+    <div class="field">
+      <label>Название привычки</label>
+      <input type="text" id="habit-name-input" placeholder="Пить 2л воды, не брать телефон до 9...">
+    </div>
+    <div class="field">
+      <label>Иконка (эмодзи)</label>
+      <div class="chips">
+        <button class="chip" onclick="selectHabitIcon(this)">💧</button>
+        <button class="chip" onclick="selectHabitIcon(this)">🏃</button>
+        <button class="chip" onclick="selectHabitIcon(this)">📚</button>
+        <button class="chip" onclick="selectHabitIcon(this)">🧘</button>
+        <button class="chip" onclick="selectHabitIcon(this)">🌿</button>
+        <button class="chip" onclick="selectHabitIcon(this)">😴</button>
+        <button class="chip" onclick="selectHabitIcon(this)">💊</button>
+        <button class="chip" onclick="selectHabitIcon(this)">✍️</button>
+        <button class="chip" onclick="selectHabitIcon(this)">🎯</button>
+        <button class="chip" onclick="selectHabitIcon(this)">🌸</button>
+      </div>
+    </div>
+    <input type="hidden" id="habit-icon-val" value="✅">
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-habit')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveHabit()">Добавить</button>
+    </div>
+  </div>
+</div>
+
+<!-- New Finance -->
+<div class="modal-overlay" id="modal-fin">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Новая транзакция</div>
+    <div class="field">
+      <div class="chips">
+        <button class="chip selected" onclick="selectFinType(this,'income')">Доход</button>
+        <button class="chip" onclick="selectFinType(this,'expense')">Расход</button>
+      </div>
+    </div>
+    <input type="hidden" id="fin-type" value="income">
+    <div class="field">
+      <label>Сумма</label>
+      <input type="number" id="fin-amount" placeholder="0">
+    </div>
+    <div class="field">
+      <label>Категория</label>
+      <select id="fin-category">
+        <option>Еда</option>
+        <option>Транспорт</option>
+        <option>Здоровье</option>
+        <option>Одежда</option>
+        <option>Развлечения</option>
+        <option>Красота</option>
+        <option>Образование</option>
+        <option>Зарплата</option>
+        <option>Подработка</option>
+        <option>Другое</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>Дата</label>
+      <input type="date" id="fin-date">
+    </div>
+    <div class="field">
+      <label>Заметка</label>
+      <input type="text" id="fin-note" placeholder="Кофе, метро...">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-fin')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveFin()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<!-- Body Measurements -->
+<div class="modal-overlay" id="modal-body">
+  <div class="modal" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <div class="modal-title">Замеры тела</div>
+    <div class="field">
+      <label>Дата</label>
+      <input type="date" id="body-date">
+    </div>
+    <div class="field">
+      <label>Вес (кг)</label>
+      <input type="number" id="body-weight-input" placeholder="60.5" step="0.1">
+    </div>
+    <div class="field">
+      <label>Грудь (см)</label>
+      <input type="number" id="body-chest-input" placeholder="90">
+    </div>
+    <div class="field">
+      <label>Талия (см)</label>
+      <input type="number" id="body-waist-input" placeholder="70">
+    </div>
+    <div class="field">
+      <label>Бедра (см)</label>
+      <input type="number" id="body-hips-input" placeholder="95">
+    </div>
+    <div class="modal-actions">
+      <button class="btn btn-ghost" onclick="closeModal('modal-body')">Отмена</button>
+      <button class="btn btn-primary" onclick="saveBody()">Сохранить</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- ===== JS ===== -->
+<script>
+// ===== DB =====
+let db;
+function initDB() {
+  return new Promise((res, rej) => {
+    const req = indexedDB.open('mylife', 3);
+    req.onupgradeneeded = e => {
+      const d = e.target.result;
+      ['tracker','diary','dreams','notes','finances','habits','habitChecks','body'].forEach(store => {
+        if (!d.objectStoreNames.contains(store)) {
+          d.createObjectStore(store, {keyPath: 'id', autoIncrement: true});
+        }
+      });
+    };
+    req.onsuccess = e => { db = e.target.result; res(db); };
+    req.onerror = e => rej(e);
+  });
+}
+
+function dbGet(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).get(key);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = e => rej(e);
+  });
+}
+
+function dbGetAll(store) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readonly');
+    const req = tx.objectStore(store).getAll();
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = e => rej(e);
+  });
+}
+
+function dbPut(store, data) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).put(data);
+    req.onsuccess = e => res(e.target.result);
+    req.onerror = e => rej(e);
+  });
+}
+
+function dbDelete(store, key) {
+  return new Promise((res, rej) => {
+    const tx = db.transaction(store, 'readwrite');
+    const req = tx.objectStore(store).delete(key);
+    req.onsuccess = () => res();
+    req.onerror = e => rej(e);
+  });
+}
+
+// ===== STATE =====
+const ratings = {};
+let selectedChips = {};
+let bristolVal = null;
+let habitIconSelected = '✅';
+let analyticsPeriod = 14;
+let diaryMediaFiles = [];
+
+// ===== NAV =====
+function nav(page) {
+  document.querySelectorAll('.page').forEach(p => p.classList.remove('active'));
+  document.querySelectorAll('.nav-item').forEach(n => n.classList.remove('active'));
+  const pg = document.getElementById('page-' + page);
+  if (pg) pg.classList.add('active');
+  const nav = document.getElementById('nav-' + page);
+  if (nav) nav.classList.add('active');
+
+  if (page === 'habits') loadHabits();
+  if (page === 'diary') loadDiary();
+  if (page === 'dreams') loadDreams();
+  if (page === 'notes') loadNotes();
+  if (page === 'finances') loadFinances();
+  if (page === 'analytics') loadAnalytics();
+  if (page === 'body') loadBody();
+  if (page === 'tracker') loadTrackerForToday();
+  closeModal('modal-more');
+}
+
+function openMoreMenu() {
+  document.getElementById('modal-more').classList.add('open');
+}
+
+// ===== MODALS =====
+function closeModal(id) {
+  document.getElementById(id).classList.remove('open');
+}
+
+// ===== RATING =====
+function selectRating(key, val, rowId) {
+  ratings[key] = val;
+  const row = document.getElementById(rowId);
+  if (!row) return;
+  row.querySelectorAll('.rating-btn').forEach((btn, i) => {
+    btn.classList.toggle('selected', i + 1 === val);
+  });
+}
+
+// ===== CHIPS =====
+function toggleChip(el, group) {
+  if (group) {
+    el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  }
+  el.classList.toggle('selected');
+  if (!selectedChips[group]) selectedChips[group] = [];
+  const val = el.textContent.trim();
+  if (el.classList.contains('selected')) {
+    selectedChips[group] = [val];
+  } else {
+    selectedChips[group] = selectedChips[group].filter(v => v !== val);
+  }
+}
+
+function getSelectedChips(parent) {
+  return Array.from(parent.querySelectorAll('.chip.selected')).map(c => c.textContent.trim());
+}
+
+function selectBristol(el, val) {
+  bristolVal = val;
+  document.querySelectorAll('#bristol-chips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+// ===== WORKOUT =====
+function toggleWorkout(el) {
+  document.getElementById('workout-details').style.display = el.checked ? 'block' : 'none';
+}
+
+// ===== TOAST =====
+function toast(msg) {
+  const t = document.getElementById('toast');
+  t.textContent = msg;
+  t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 2400);
+}
+
+// ===== TODAY =====
+function initToday() {
+  const now = new Date();
+  const h = now.getHours();
+  const greetings = ['Доброй ночи', 'Доброе утро', 'Добрый день', 'Добрый вечер'];
+  const gi = h < 5 ? 0 : h < 12 ? 1 : h < 18 ? 2 : 3;
+  document.getElementById('greeting-text').textContent = greetings[gi];
+  const days = ['воскресенье','понедельник','вторник','среда','четверг','пятница','суббота'];
+  const months = ['января','февраля','марта','апреля','мая','июня','июля','августа','сентября','октября','ноября','декабря'];
+  document.getElementById('greeting-date').textContent = `${days[now.getDay()]}, ${now.getDate()} ${months[now.getMonth()]}`;
+
+  const tLabel = document.getElementById('tracker-date-label');
+  if (tLabel) tLabel.textContent = `${now.getDate()} ${months[now.getMonth()]} ${now.getFullYear()}`;
+
+  const fLabel = document.getElementById('fin-month-label');
+  if (fLabel) fLabel.textContent = `${['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][now.getMonth()]} ${now.getFullYear()}`;
+
+  const hmLabel = document.getElementById('habits-month-label');
+  if (hmLabel) hmLabel.textContent = `${['Январь','Февраль','Март','Апрель','Май','Июнь','Июль','Август','Сентябрь','Октябрь','Ноябрь','Декабрь'][now.getMonth()]}`;
+
+  loadTodaySummary();
+}
+
+function setMoodToday(v) {
+  ratings['today-mood'] = v;
+  document.querySelectorAll('#mood-today .rating-btn').forEach((b,i) => b.classList.toggle('selected', i+1===v));
+  const today = todayStr();
+  dbPut('tracker', {dateKey: today, moodQuick: v, id: 'quick_' + today});
+}
+
+function todayStr() {
+  return new Date().toISOString().slice(0,10);
+}
+
+async function loadTodaySummary() {
+  const today = todayStr();
+  const all = await dbGetAll('tracker');
+  const rec = all.find(r => r.dateKey === today);
+  if (rec) {
+    document.getElementById('today-sleep').textContent = rec.sleepH ? rec.sleepH + 'ч' : '--';
+    document.getElementById('today-steps').textContent = rec.steps ? rec.steps.toLocaleString() : '--';
+    document.getElementById('today-water').textContent = rec.water ? rec.water + 'мл' : '--';
+    if (rec.moodQuick || rec.mood) {
+      const m = rec.moodQuick || rec.mood;
+      const emojis = ['','😞','😕','😐','🙂','😊'];
+      document.querySelectorAll('#mood-today .rating-btn').forEach((b,i) => b.classList.toggle('selected', i+1===m));
+    }
+  }
+  const habits = await dbGetAll('habits');
+  const checks = await dbGetAll('habitChecks');
+  const todayChecks = checks.filter(c => c.dateKey === today);
+  document.getElementById('today-habits').textContent = `${todayChecks.length}/${habits.length}`;
+}
+
+// ===== TRACKER =====
+async function loadTrackerForToday() {
+  const today = todayStr();
+  const all = await dbGetAll('tracker');
+  const rec = all.find(r => r.dateKey === today);
+  if (!rec) return;
+
+  if (rec.sleepH) document.getElementById('tr-sleep-h').value = rec.sleepH;
+  if (rec.steps) document.getElementById('tr-steps').value = rec.steps;
+  if (rec.water) document.getElementById('tr-water').value = rec.water;
+  if (rec.caffeine) document.getElementById('tr-caffeine').value = rec.caffeine;
+  if (rec.alcoholQty) document.getElementById('tr-alcohol-qty').value = rec.alcoholQty;
+  if (rec.nutrition) document.getElementById('tr-nutrition').value = rec.nutrition;
+  if (rec.pain) document.getElementById('tr-pain').value = rec.pain;
+  if (rec.cycleDay) document.getElementById('tr-cycle-day').value = rec.cycleDay;
+  if (rec.workoutDur) document.getElementById('tr-workout-dur').value = rec.workoutDur;
+  if (rec.mood) selectRating('mood', rec.mood, 'mood-row');
+  if (rec.energy) selectRating('energy', rec.energy, 'energy-row');
+  if (rec.sleepQ) selectRating('sleep-q', rec.sleepQ, 'sleep-q-row');
+  if (rec.meditation) document.getElementById('tr-meditation').checked = rec.meditation;
+  if (rec.sex) document.getElementById('tr-sex').checked = rec.sex;
+  if (rec.lucid) document.getElementById('tr-lucid').checked = rec.lucid;
+  if (rec.workout) {
+    document.getElementById('tr-workout-toggle').checked = true;
+    toggleWorkout({checked: true});
+  }
+}
+
+function addMed() {
+  const list = document.getElementById('meds-list');
+  const div = document.createElement('div');
+  div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+  div.innerHTML = `
+    <input type="text" placeholder="Название" style="flex:2;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+    <input type="text" placeholder="Доза" style="flex:1;padding:10px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);">
+    <button onclick="this.parentElement.remove()" style="padding:10px;color:var(--text2);">✕</button>
+  `;
+  list.appendChild(div);
+}
+
+async function saveTracker() {
+  const today = todayStr();
+  const meds = [];
+  document.querySelectorAll('#meds-list > div').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    if (inputs[0].value) meds.push({name: inputs[0].value, dose: inputs[1].value});
+  });
+
+  const workoutTypes = getSelectedChips(document.getElementById('workout-chips'));
+
+  const data = {
+    id: 'tracker_' + today,
+    dateKey: today,
+    sleepH: parseFloat(document.getElementById('tr-sleep-h').value) || null,
+    sleepQ: ratings['sleep-q'] || null,
+    sleepStart: document.getElementById('tr-sleep-start').value || null,
+    sleepEnd: document.getElementById('tr-sleep-end').value || null,
+    steps: parseInt(document.getElementById('tr-steps').value) || null,
+    water: parseInt(document.getElementById('tr-water').value) || null,
+    caffeine: parseInt(document.getElementById('tr-caffeine').value) || null,
+    alcoholQty: parseInt(document.getElementById('tr-alcohol-qty').value) || null,
+    alcoholType: document.getElementById('tr-alcohol-type').value || null,
+    mood: ratings['mood'] || null,
+    energy: ratings['energy'] || null,
+    pain: document.getElementById('tr-pain').value || null,
+    nutrition: document.getElementById('tr-nutrition').value || null,
+    meds,
+    workout: document.getElementById('tr-workout-toggle').checked,
+    workoutTypes,
+    workoutDur: parseInt(document.getElementById('tr-workout-dur').value) || null,
+    workoutNote: document.getElementById('tr-workout-note') ? document.getElementById('tr-workout-note').value : null,
+    meditation: document.getElementById('tr-meditation').checked,
+    sex: document.getElementById('tr-sex').checked,
+    lucid: document.getElementById('tr-lucid').checked,
+    cycleDay: parseInt(document.getElementById('tr-cycle-day').value) || null,
+    discharge: (selectedChips['discharge'] || []).join(', '),
+    bristol: bristolVal,
+    createdAt: new Date().toISOString()
+  };
+
+  await dbPut('tracker', data);
+  toast('День сохранён');
+  loadTodaySummary();
+}
+
+// ===== HABITS =====
+async function loadHabits() {
+  const habits = await dbGetAll('habits');
+  const checks = await dbGetAll('habitChecks');
+  const today = todayStr();
+  const list = document.getElementById('habits-list');
+
+  if (habits.length === 0) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:14px;padding:8px 0;">Нет привычек. Нажми + чтобы добавить.</div>';
+    return;
+  }
+
+  list.innerHTML = habits.map(h => {
+    const checked = checks.find(c => c.habitId === h.id && c.dateKey === today);
+    return `
+      <div class="habit-item">
+        <div class="habit-check ${checked ? 'checked' : ''}" onclick="toggleHabitCheck(${h.id}, this)"></div>
+        <div style="flex:1;">
+          <div class="habit-name">${h.icon} ${h.name}</div>
+        </div>
+        <button onclick="deleteHabit(${h.id})" style="color:var(--text2);font-size:18px;padding:4px;">✕</button>
+      </div>
+    `;
+  }).join('');
+}
+
+async function toggleHabitCheck(habitId, el) {
+  const today = todayStr();
+  const checks = await dbGetAll('habitChecks');
+  const existing = checks.find(c => c.habitId === habitId && c.dateKey === today);
+  if (existing) {
+    await dbDelete('habitChecks', existing.id);
+    el.classList.remove('checked');
+  } else {
+    await dbPut('habitChecks', {habitId, dateKey: today, createdAt: new Date().toISOString()});
+    el.classList.add('checked');
+  }
+  loadTodaySummary();
+}
+
+function openHabitModal() {
+  document.getElementById('habit-name-input').value = '';
+  habitIconSelected = '✅';
+  document.querySelectorAll('#modal-habit .chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('modal-habit').classList.add('open');
+}
+
+function selectHabitIcon(el) {
+  document.querySelectorAll('#modal-habit .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  habitIconSelected = el.textContent.trim();
+}
+
+async function saveHabit() {
+  const name = document.getElementById('habit-name-input').value.trim();
+  if (!name) { toast('Введи название привычки'); return; }
+  await dbPut('habits', {name, icon: habitIconSelected, createdAt: new Date().toISOString()});
+  closeModal('modal-habit');
+  toast('Привычка добавлена');
+  loadHabits();
+}
+
+async function deleteHabit(id) {
+  if (!confirm('Удалить эту привычку?')) return;
+  await dbDelete('habits', id);
+  loadHabits();
+}
+
+// ===== DIARY =====
+function openDiaryNew() {
+  document.getElementById('diary-date').value = todayStr();
+  document.getElementById('diary-text').value = '';
+  document.getElementById('diary-tags').value = '';
+  document.getElementById('diary-media-preview').innerHTML = '';
+  ratings['diary-mood'] = null;
+  document.querySelectorAll('#diary-mood-row .rating-btn').forEach(b => b.classList.remove('selected'));
+  diaryMediaFiles = [];
+  document.getElementById('modal-diary').classList.add('open');
+}
+
+function previewDiaryMedia(input) {
+  const preview = document.getElementById('diary-media-preview');
+  Array.from(input.files).forEach(f => {
+    diaryMediaFiles.push(f);
+    const reader = new FileReader();
+    reader.onload = e => {
+      const el = document.createElement('div');
+      el.className = 'media-thumb';
+      if (f.type.startsWith('image/')) {
+        el.innerHTML = `<img src="${e.target.result}" style="width:100%;height:100%;object-fit:cover;border-radius:8px;">`;
+      } else if (f.type.startsWith('video/')) {
+        el.textContent = '🎥';
+      } else {
+        el.textContent = '🎵';
+      }
+      preview.appendChild(el);
+    };
+    reader.readAsDataURL(f);
+  });
+}
+
+async function saveDiary() {
+  const text = document.getElementById('diary-text').value.trim();
+  if (!text) { toast('Напиши хоть что-нибудь'); return; }
+
+  const mediaData = [];
+  for (const f of diaryMediaFiles) {
+    const data = await new Promise(res => {
+      const reader = new FileReader();
+      reader.onload = e => res({name: f.name, type: f.type, data: e.target.result});
+      reader.readAsDataURL(f);
+    });
+    mediaData.push(data);
+  }
+
+  await dbPut('diary', {
+    date: document.getElementById('diary-date').value,
+    text,
+    mood: ratings['diary-mood'] || null,
+    tags: document.getElementById('diary-tags').value,
+    media: mediaData,
+    createdAt: new Date().toISOString()
+  });
+  closeModal('modal-diary');
+  toast('Запись сохранена');
+  loadDiary();
+}
+
+async function loadDiary() {
+  const entries = await dbGetAll('diary');
+  entries.sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  const list = document.getElementById('diary-list');
+
+  if (entries.length === 0) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:14px;background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;">Здесь появятся твои записи. Нажми + чтобы написать.</div>';
+    return;
+  }
+
+  const moodEmoji = ['','😞','😕','😐','🙂','😊'];
+  list.innerHTML = entries.map(e => {
+    const d = new Date(e.date || e.createdAt);
+    const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long',year:'numeric'});
+    const preview = e.text.length > 180 ? e.text.slice(0,180) + '...' : e.text;
+    const media = (e.media || []).map(m => {
+      if (m.type && m.type.startsWith('image/')) {
+        return `<img src="${m.data}" class="media-thumb" style="object-fit:cover;">`;
+      }
+      return `<div class="media-thumb">${m.type && m.type.startsWith('video/') ? '🎥' : '🎵'}</div>`;
+    }).join('');
+    return `
+      <div class="diary-entry">
+        <div class="entry-date">${dateStr}</div>
+        <div class="entry-text">${preview}</div>
+        ${e.mood ? `<span class="entry-mood">${moodEmoji[e.mood]}</span>` : ''}
+        ${media ? `<div class="entry-media">${media}</div>` : ''}
+        ${e.tags ? `<div style="margin-top:8px;font-size:12px;color:var(--text2);">${e.tags.split(',').map(t=>`<span style="background:var(--teal-light);color:var(--teal);padding:2px 8px;border-radius:10px;margin-right:4px;">${t.trim()}</span>`).join('')}</div>` : ''}
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== DREAMS =====
+function openDreamNew() {
+  document.getElementById('dream-date').value = todayStr();
+  document.getElementById('dream-text').value = '';
+  document.getElementById('dream-tags').value = '';
+  document.getElementById('dream-lucid').checked = false;
+  document.querySelectorAll('#modal-dream .chip').forEach(c => c.classList.remove('selected'));
+  document.getElementById('modal-dream').classList.add('open');
+}
+
+async function saveDream() {
+  const text = document.getElementById('dream-text').value.trim();
+  if (!text) { toast('Опиши сон'); return; }
+  const feelEls = document.querySelectorAll('#modal-dream .chip.selected');
+  const feel = Array.from(feelEls).map(e => e.textContent.trim()).join(', ');
+  await dbPut('dreams', {
+    date: document.getElementById('dream-date').value,
+    text,
+    feel,
+    tags: document.getElementById('dream-tags').value,
+    lucid: document.getElementById('dream-lucid').checked,
+    createdAt: new Date().toISOString()
+  });
+  closeModal('modal-dream');
+  toast('Сон записан');
+  loadDreams();
+}
+
+async function loadDreams() {
+  const entries = await dbGetAll('dreams');
+  entries.sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  const list = document.getElementById('dreams-list');
+
+  if (entries.length === 0) {
+    list.innerHTML = '<div class="dreams-card"><div style="color:#8090AA;font-size:14px;text-align:center;padding:8px 0;">Запиши свой первый сон.</div></div>';
+    return;
+  }
+
+  list.innerHTML = entries.map(e => {
+    const d = new Date(e.date || e.createdAt);
+    const dateStr = d.toLocaleDateString('ru', {day:'numeric',month:'long'});
+    const preview = e.text.length > 200 ? e.text.slice(0,200) + '...' : e.text;
+    const tags = e.tags ? e.tags.split(',').map(t => `<span class="dream-tag">${t.trim()}</span>`).join('') : '';
+    return `
+      <div class="dream-entry">
+        <div class="entry-date">${dateStr}${e.feel ? ' · ' + e.feel : ''}</div>
+        <div class="entry-text" style="margin-top:6px;">${preview}</div>
+        <div style="margin-top:8px;">
+          ${e.lucid ? '<span class="dream-tag lucid">✦ осознанный</span>' : ''}
+          ${tags}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+// ===== NOTES =====
+function openNoteNew() {
+  document.getElementById('note-text').value = '';
+  document.getElementById('note-source').value = '';
+  document.getElementById('note-tags').value = '';
+  document.getElementById('modal-note').classList.add('open');
+}
+
+async function saveNote() {
+  const text = document.getElementById('note-text').value.trim();
+  if (!text) { toast('Введи текст'); return; }
+  await dbPut('notes', {
+    text,
+    source: document.getElementById('note-source').value,
+    tags: document.getElementById('note-tags').value,
+    createdAt: new Date().toISOString()
+  });
+  closeModal('modal-note');
+  toast('Заметка сохранена');
+  loadNotes();
+}
+
+async function loadNotes() {
+  const notes = await dbGetAll('notes');
+  notes.sort((a,b) => b.createdAt.localeCompare(a.createdAt));
+  const list = document.getElementById('notes-list');
+  if (notes.length === 0) {
+    list.innerHTML = '<div style="color:var(--text2);font-size:14px;background:var(--card);border-radius:var(--radius);padding:16px;text-align:center;">Сохраняй цитаты и важные мысли. Нажми + чтобы добавить.</div>';
+    return;
+  }
+  list.innerHTML = notes.map(n => `
+    <div class="note-item">
+      <div class="note-text">${n.text}</div>
+      ${n.source ? `<div class="note-source">— ${n.source}</div>` : ''}
+      ${n.tags ? `<div class="note-tags">${n.tags.split(',').map(t=>`<span style="background:var(--gold-light);color:var(--gold);padding:2px 8px;border-radius:10px;margin-right:4px;font-size:12px;">${t.trim()}</span>`).join('')}</div>` : ''}
+    </div>
+  `).join('');
+}
+
+// ===== FINANCES =====
+const catIcons = {Еда:'🍎',Транспорт:'🚗',Здоровье:'💊',Одежда:'👗',Развлечения:'🎭',Красота:'💄',Образование:'📚',Зарплата:'💰',Подработка:'💼',Другое:'📌'};
+
+function openFinModal() {
+  document.getElementById('fin-amount').value = '';
+  document.getElementById('fin-note').value = '';
+  document.getElementById('fin-date').value = todayStr();
+  document.getElementById('modal-fin').classList.add('open');
+}
+
+function selectFinType(el, type) {
+  document.getElementById('fin-type').value = type;
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+async function saveFin() {
+  const amt = parseFloat(document.getElementById('fin-amount').value);
+  if (!amt) { toast('Введи сумму'); return; }
+  await dbPut('finances', {
+    type: document.getElementById('fin-type').value,
+    amount: amt,
+    category: document.getElementById('fin-category').value,
+    date: document.getElementById('fin-date').value,
+    note: document.getElementById('fin-note').value,
+    createdAt: new Date().toISOString()
+  });
+  closeModal('modal-fin');
+  toast('Сохранено');
+  loadFinances();
+}
+
+async function loadFinances() {
+  const all = await dbGetAll('finances');
+  const now = new Date();
+  const monthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const month = all.filter(t => (t.date || '').startsWith(monthKey));
+
+  const income = month.filter(t => t.type === 'income').reduce((s,t) => s + t.amount, 0);
+  const expense = month.filter(t => t.type === 'expense').reduce((s,t) => s + t.amount, 0);
+  document.getElementById('fin-income').textContent = income.toLocaleString();
+  document.getElementById('fin-expense').textContent = expense.toLocaleString();
+
+  const sorted = month.sort((a,b) => (b.date||'').localeCompare(a.date||''));
+  const txList = document.getElementById('tx-list');
+  if (sorted.length === 0) {
+    txList.innerHTML = '<div style="color:var(--text2);font-size:14px;padding:8px 0;">Нет записей в этом месяце.</div>';
+    return;
+  }
+  txList.innerHTML = sorted.map(t => `
+    <div class="tx-item ${t.type}">
+      <div class="tx-icon" style="background:${t.type==='income'?'var(--teal-light)':'var(--rose-light)'};">${catIcons[t.category]||'📌'}</div>
+      <div class="tx-info">
+        <div class="tx-name">${t.category}${t.note ? ' · '+t.note : ''}</div>
+        <div class="tx-cat">${t.date}</div>
+      </div>
+      <div class="tx-amount">${t.type==='income'?'+':'-'}${t.amount.toLocaleString()}</div>
+    </div>
+  `).join('');
+}
+
+// ===== BODY =====
+function openBodyModal() {
+  document.getElementById('body-date').value = todayStr();
+  ['weight','chest','waist','hips'].forEach(f => document.getElementById('body-'+f+'-input').value = '');
+  document.getElementById('modal-body').classList.add('open');
+}
+
+async function saveBody() {
+  await dbPut('body', {
+    date: document.getElementById('body-date').value,
+    weight: parseFloat(document.getElementById('body-weight-input').value) || null,
+    chest: parseFloat(document.getElementById('body-chest-input').value) || null,
+    waist: parseFloat(document.getElementById('body-waist-input').value) || null,
+    hips: parseFloat(document.getElementById('body-hips-input').value) || null,
+    createdAt: new Date().toISOString()
+  });
+  closeModal('modal-body');
+  toast('Замеры сохранены');
+  loadBody();
+}
+
+async function loadBody() {
+  const all = await dbGetAll('body');
+  if (all.length === 0) return;
+  const last = all.sort((a,b) => b.date.localeCompare(a.date))[0];
+  document.getElementById('body-weight').textContent = last.weight ? last.weight + ' кг' : '-- кг';
+  document.getElementById('body-chest').textContent = last.chest ? last.chest + ' см' : '-- см';
+  document.getElementById('body-waist').textContent = last.waist ? last.waist + ' см' : '-- см';
+  document.getElementById('body-hips').textContent = last.hips ? last.hips + ' см' : '-- см';
+
+  const photos = document.getElementById('body-photos');
+  const bodyRecs = all.filter(r => r.photoData);
+  if (bodyRecs.length > 0) {
+    photos.innerHTML = bodyRecs.slice(-6).map(r => `<img src="${r.photoData}" style="width:80px;height:100px;object-fit:cover;border-radius:10px;">`).join('');
+  }
+}
+
+async function addBodyPhoto(input) {
+  const file = input.files[0];
+  if (!file) return;
+  const data = await new Promise(res => {
+    const reader = new FileReader();
+    reader.onload = e => res(e.target.result);
+    reader.readAsDataURL(file);
+  });
+  await dbPut('body', {
+    date: todayStr(),
+    photoData: data,
+    createdAt: new Date().toISOString()
+  });
+  toast('Фото добавлено');
+  loadBody();
+}
+
+// ===== ANALYTICS =====
+function setPeriod(days, el) {
+  analyticsPeriod = days;
+  document.querySelectorAll('#page-analytics .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  loadAnalytics();
+}
+
+async function loadAnalytics() {
+  const all = await dbGetAll('tracker');
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - analyticsPeriod);
+  const data = all.filter(r => new Date(r.dateKey) >= cutoff);
+
+  if (data.length === 0) {
+    document.getElementById('stats-content').innerHTML = '<div style="color:var(--text2);font-size:14px;padding:8px 0;">Недостаточно данных за выбранный период.</div>';
+    document.getElementById('mood-chart').innerHTML = '';
+    return;
+  }
+
+  const avg = (arr, key) => {
+    const vals = arr.map(r => r[key]).filter(v => v != null && !isNaN(v));
+    return vals.length ? (vals.reduce((s,v) => s+v, 0) / vals.length).toFixed(1) : null;
+  };
+
+  const avgSleep = avg(data, 'sleepH');
+  const avgSteps = avg(data, 'steps');
+  const avgWater = avg(data, 'water');
+  const avgMood = avg(data, 'mood');
+  const avgEnergy = avg(data, 'energy');
+  const workoutDays = data.filter(r => r.workout).length;
+  const meditationDays = data.filter(r => r.meditation).length;
+  const alcoholDays = data.filter(r => r.alcoholQty > 0).length;
+
+  const statsHTML = `
+    <div class="stat-row"><span class="stat-label">Средний сон</span><span class="stat-val">${avgSleep ? avgSleep + ' ч' : 'нет данных'}</span></div>
+    <div class="stat-row"><span class="stat-label">Средние шаги</span><span class="stat-val">${avgSteps ? parseInt(avgSteps).toLocaleString() : 'нет данных'}</span></div>
+    <div class="stat-row"><span class="stat-label">Средняя вода</span><span class="stat-val">${avgWater ? avgWater + ' мл' : 'нет данных'}</span></div>
+    <div class="stat-row"><span class="stat-label">Среднее настроение</span><span class="stat-val">${avgMood ? avgMood + '/10' : 'нет данных'}</span></div>
+    <div class="stat-row"><span class="stat-label">Средняя энергия</span><span class="stat-val">${avgEnergy ? avgEnergy + '/10' : 'нет данных'}</span></div>
+    <div class="stat-row"><span class="stat-label">Тренировок</span><span class="stat-val">${workoutDays} дн.</span></div>
+    <div class="stat-row"><span class="stat-label">Медитаций</span><span class="stat-val">${meditationDays} дн.</span></div>
+    <div class="stat-row"><span class="stat-label">Дней с алкоголем</span><span class="stat-val">${alcoholDays} дн.</span></div>
+  `;
+  document.getElementById('stats-content').innerHTML = statsHTML;
+
+  // Mood chart
+  const sorted = data.sort((a,b) => a.dateKey.localeCompare(b.dateKey)).slice(-14);
+  const chartEl = document.getElementById('mood-chart');
+  if (sorted.some(r => r.mood)) {
+    chartEl.innerHTML = sorted.map(r => {
+      const d = new Date(r.dateKey);
+      const label = String(d.getDate()).padStart(2,'0') + '/' + String(d.getMonth()+1).padStart(2,'0');
+      const pct = r.mood ? (r.mood / 10 * 100) + '%' : '0%';
+      return `
+        <div class="bar-row">
+          <div class="bar-label" style="font-size:11px;width:36px;">${label}</div>
+          <div class="bar-track"><div class="bar-fill" style="width:${pct};"></div></div>
+          <div class="bar-val">${r.mood || '-'}</div>
+        </div>
+      `;
+    }).join('');
+  } else {
+    chartEl.innerHTML = '<div style="color:var(--text2);font-size:13px;">Нет данных о настроении</div>';
+  }
+}
+
+async function runAIAnalysis() {
+  const btn = document.querySelector('#page-analytics .btn-primary');
+  btn.textContent = 'Анализирую...';
+  btn.disabled = true;
+
+  const all = await dbGetAll('tracker');
+  const cutoff = new Date();
+  cutoff.setDate(cutoff.getDate() - analyticsPeriod);
+  const data = all.filter(r => new Date(r.dateKey) >= cutoff);
+
+  const summary = data.map(r => `${r.dateKey}: сон=${r.sleepH}ч, шаги=${r.steps}, вода=${r.water}мл, настроение=${r.mood}/10, энергия=${r.energy}/10, алкоголь=${r.alcoholQty||0}, тренировка=${r.workout?'да':'нет'}, медитация=${r.meditation?'да':'нет'}`).join('\n');
+
+  try {
+    const resp = await fetch('https://api.anthropic.com/v1/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        model: 'claude-sonnet-4-6',
+        max_tokens: 1000,
+        system: 'Ты помогаешь анализировать данные о здоровье и самочувствии. Отвечай на русском языке, кратко и по делу. Ищи реальные паттерны и корреляции в данных. Пиши простым языком, без воды.',
+        messages: [{ role: 'user', content: `Вот мои данные за ${analyticsPeriod} дней. Найди корреляции и паттерны, дай практические выводы:\n\n${summary}` }]
+      })
+    });
+    const json = await resp.json();
+    const text = json.content?.[0]?.text || 'Не удалось получить ответ';
+    const resultEl = document.getElementById('ai-analysis-result');
+    resultEl.style.display = 'block';
+    resultEl.style.cssText = 'display:block;font-size:14px;line-height:1.7;padding:12px;background:var(--teal-light);border-radius:10px;color:var(--text);margin-top:14px;';
+    resultEl.textContent = text;
+  } catch(e) {
+    toast('Ошибка анализа. Проверь подключение.');
+  }
+
+  btn.textContent = 'Запустить анализ';
+  btn.disabled = false;
+}
+
+// ===== EXPORT =====
+async function exportData() {
+  const stores = ['tracker','diary','dreams','notes','finances','habits','habitChecks','body'];
+  const exported = {};
+  for (const s of stores) {
+    exported[s] = await dbGetAll(s);
+  }
+  const blob = new Blob([JSON.stringify(exported, null, 2)], {type: 'application/json'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `mylife-backup-${todayStr()}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('Данные экспортированы');
+}
+
+// ===== SERVICE WORKER =====
+if ('serviceWorker' in navigator) {
+  navigator.serviceWorker.register('sw.js').catch(() => {});
+}
+
+// ===== INIT =====
+initDB().then(() => {
+  initToday();
+}).catch(e => console.error('DB error:', e));
+</script>
+</body>
+</html>
