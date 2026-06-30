@@ -608,6 +608,7 @@ a { color: inherit; text-decoration: none; }
   </div>
   <div class="page-content section-top" id="tracker-form">
 
+    <!-- СОН -->
     <div class="card">
       <div class="card-title">🌙 Сон</div>
       <div class="field">
@@ -615,14 +616,11 @@ a { color: inherit; text-decoration: none; }
         <input type="number" id="tr-sleep-h" placeholder="7.5" step="0.5" min="0" max="24">
       </div>
       <div class="field">
-        <label>Качество сна</label>
-        <div class="rating-row" id="sleep-q-row">
-          <button class="rating-btn" onclick="selectRating('sleep-q',1,'sleep-q-row')">1</button>
-          <button class="rating-btn" onclick="selectRating('sleep-q',2,'sleep-q-row')">2</button>
-          <button class="rating-btn" onclick="selectRating('sleep-q',3,'sleep-q-row')">3</button>
-          <button class="rating-btn" onclick="selectRating('sleep-q',4,'sleep-q-row')">4</button>
-          <button class="rating-btn" onclick="selectRating('sleep-q',5,'sleep-q-row')">5</button>
-        </div>
+        <label>Качество сна: <span id="sleep-q-val" style="color:var(--teal);font-weight:600;">--</span></label>
+        <input type="range" id="tr-sleep-q" min="0" max="100" step="1" value=""
+          oninput="document.getElementById('sleep-q-val').textContent=this.value"
+          style="width:100%;accent-color:var(--teal);height:4px;cursor:pointer;">
+        <div style="display:flex;justify-content:space-between;font-size:11px;color:var(--text2);margin-top:4px;"><span>0</span><span>50</span><span>100</span></div>
       </div>
       <div style="display:flex;gap:10px;">
         <div class="field" style="flex:1"><label>Заснула</label><input type="time" id="tr-sleep-start"></div>
@@ -630,36 +628,47 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
+    <!-- ФИЗИЧЕСКИЕ ПОКАЗАТЕЛИ -->
     <div class="card">
-      <div class="card-title">💧 Физические показатели</div>
+      <div class="card-title">🏃 Физические показатели</div>
       <div class="field">
         <label>Шаги</label>
         <input type="number" id="tr-steps" placeholder="8500">
       </div>
-      <div class="field">
-        <label>Вода (мл)</label>
-        <input type="number" id="tr-water" placeholder="2000" step="100">
+      <div class="toggle-row" style="padding:10px 0 6px;">
+        <div><div class="toggle-label">Была тренировка</div></div>
+        <label class="toggle">
+          <input type="checkbox" id="tr-workout-toggle" onchange="toggleWorkout(this)">
+          <span class="toggle-track"></span>
+        </label>
       </div>
-      <div class="field">
-        <label>Кофеин (порций)</label>
-        <input type="number" id="tr-caffeine" placeholder="1" min="0">
-      </div>
-      <div class="field">
-        <label>Алкоголь</label>
-        <div style="display:flex;gap:8px;">
-          <input type="number" id="tr-alcohol-qty" placeholder="0 порц." min="0" style="flex:1">
-          <select id="tr-alcohol-type" style="flex:1.5;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;">
-            <option value="">Тип</option>
-            <option>Вино</option>
-            <option>Пиво</option>
-            <option>Крепкое</option>
-            <option>Игристое</option>
-            <option>Другое</option>
-          </select>
+      <div id="workout-details" style="display:none;margin-top:10px;">
+        <div class="field">
+          <label>Вид тренировки</label>
+          <div class="chips" id="workout-chips">
+            <button class="chip" onclick="toggleWorkoutChip(this,'Кардио')">Кардио</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Силовая')">Силовая</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Йога')">Йога</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Растяжка')">Растяжка</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Бег')">Бег</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Плавание')">Плавание</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'Пилатес')">Пилатес</button>
+            <button class="chip" onclick="toggleWorkoutChip(this,'__other__')">Другое</button>
+          </div>
+          <input type="text" id="tr-workout-other" placeholder="Введи вид тренировки..." style="display:none;margin-top:8px;width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;">
+        </div>
+        <div class="field">
+          <label>Продолжительность (мин)</label>
+          <input type="number" id="tr-workout-dur" placeholder="45">
+        </div>
+        <div class="field">
+          <label>Заметки</label>
+          <textarea id="tr-workout-note" placeholder="Как прошло, что делала..."></textarea>
         </div>
       </div>
     </div>
 
+    <!-- САМОЧУВСТВИЕ -->
     <div class="card">
       <div class="card-title">😊 Самочувствие</div>
       <div class="field">
@@ -698,69 +707,47 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
+    <!-- ПИТАНИЕ И ГИДРАТАЦИЯ -->
     <div class="card">
-      <div class="card-title">🍎 Питание</div>
+      <div class="card-title">🍎 Питание и гидратация</div>
       <div class="field">
         <label>Общая характеристика дня</label>
         <textarea id="tr-nutrition" placeholder="Ел(а) хорошо, много овощей, мало сахара..."></textarea>
       </div>
+      <div class="field">
+        <label>Вода (мл)</label>
+        <input type="number" id="tr-water" placeholder="2000" step="100">
+      </div>
+      <div class="field">
+        <label>Кофеин (порций)</label>
+        <input type="number" id="tr-caffeine" placeholder="1" min="0">
+      </div>
+      <div class="field">
+        <label>Алкоголь</label>
+        <div id="alcohol-list">
+          <div class="alcohol-entry" style="display:flex;gap:8px;margin-bottom:8px;">
+            <input type="text" placeholder="Название напитка" style="flex:2;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;">
+            <input type="number" placeholder="мл" min="0" style="flex:1;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;">
+          </div>
+        </div>
+        <button class="btn btn-ghost" onclick="addAlcohol()" style="margin-top:4px;font-size:13px;padding:8px;">+ Ещё напиток</button>
+      </div>
     </div>
 
+    <!-- ЛЕКАРСТВА -->
     <div class="card">
       <div class="card-title">💊 Лекарства и добавки</div>
       <div id="meds-list"></div>
       <button class="btn btn-ghost" onclick="addMed()" style="margin-top:8px;">+ Добавить</button>
     </div>
 
-    <div class="card">
-      <div class="card-title">🚴 Тренировка</div>
-      <div class="toggle-row">
-        <div>
-          <div class="toggle-label">Была тренировка</div>
-        </div>
-        <label class="toggle">
-          <input type="checkbox" id="tr-workout-toggle" onchange="toggleWorkout(this)">
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-      <div id="workout-details" style="display:none; margin-top:12px;">
-        <div class="field">
-          <label>Вид тренировки</label>
-          <div class="chips" id="workout-chips">
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Кардио</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Силовая</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Йога</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Растяжка</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Бег</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Плавание</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Пилатес</button>
-            <button class="chip" onclick="toggleChip(this,'workout-type')">Другое</button>
-          </div>
-        </div>
-        <div class="field">
-          <label>Продолжительность (мин)</label>
-          <input type="number" id="tr-workout-dur" placeholder="45">
-        </div>
-        <div class="field">
-          <label>Заметки о тренировке</label>
-          <textarea id="tr-workout-note" placeholder="Как прошло, что делала..."></textarea>
-        </div>
-      </div>
-    </div>
-
+    <!-- ПРАКТИКИ -->
     <div class="card">
       <div class="card-title">🧘 Практики</div>
       <div class="toggle-row">
         <div class="toggle-label">Медитация / духовная практика</div>
         <label class="toggle">
           <input type="checkbox" id="tr-meditation">
-          <span class="toggle-track"></span>
-        </label>
-      </div>
-      <div class="toggle-row">
-        <div class="toggle-label">Половой контакт</div>
-        <label class="toggle">
-          <input type="checkbox" id="tr-sex">
           <span class="toggle-track"></span>
         </label>
       </div>
@@ -776,6 +763,7 @@ a { color: inherit; text-decoration: none; }
       </div>
     </div>
 
+    <!-- ЦИКЛ -->
     <div class="card">
       <div class="card-title">🌸 Цикл</div>
       <div class="field">
@@ -784,31 +772,57 @@ a { color: inherit; text-decoration: none; }
       </div>
       <div class="field">
         <label>Характер выделений</label>
-        <div class="chips">
+        <div class="chips" id="discharge-chips">
           <button class="chip" onclick="toggleChip(this,'discharge')">Нет</button>
           <button class="chip" onclick="toggleChip(this,'discharge')">Скудные</button>
           <button class="chip" onclick="toggleChip(this,'discharge')">Умеренные</button>
           <button class="chip" onclick="toggleChip(this,'discharge')">Обильные</button>
           <button class="chip" onclick="toggleChip(this,'discharge')">Сгустки</button>
           <button class="chip" onclick="toggleChip(this,'discharge')">Слизистые</button>
+          <button class="chip" onclick="toggleDischargeOther(this)">Другое</button>
+        </div>
+        <input type="text" id="tr-discharge-other" placeholder="Опиши подробнее..." style="display:none;margin-top:8px;width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;">
+      </div>
+      <div class="field">
+        <label>Половой контакт</label>
+        <div class="toggle-row" style="padding:0;border:none;margin-bottom:8px;">
+          <span style="font-size:14px;color:var(--text2);">Был половой контакт</span>
+          <label class="toggle">
+            <input type="checkbox" id="tr-sex" onchange="toggleSexDetails(this)">
+            <span class="toggle-track"></span>
+          </label>
+        </div>
+        <div id="sex-details" style="display:none;">
+          <div class="chips" id="sex-chips">
+            <button class="chip" onclick="toggleChip(this,'sex-type')">Вагинальный</button>
+            <button class="chip" onclick="toggleChip(this,'sex-type')">Оральный</button>
+            <button class="chip" onclick="toggleChip(this,'sex-type')">Анальный</button>
+            <button class="chip" onclick="toggleChip(this,'sex-type')">Петтинг</button>
+            <button class="chip" onclick="toggleSexOther(this)">Другое</button>
+          </div>
+          <input type="text" id="tr-sex-other" placeholder="Уточни..." style="display:none;margin-top:8px;width:100%;padding:12px 14px;background:var(--bg);border:1px solid var(--border);border-radius:var(--radius-sm);color:var(--text);outline:none;">
         </div>
       </div>
     </div>
 
     <div class="card">
       <div class="card-title">🚽 Стул (Бристольская шкала)</div>
-      <div class="field">
-        <div class="chips" style="flex-direction:column;gap:6px;" id="bristol-chips">
-          <button class="chip" onclick="selectBristol(this,1)" style="text-align:left;">Тип 1: отдельные твердые комочки</button>
-          <button class="chip" onclick="selectBristol(this,2)" style="text-align:left;">Тип 2: колбасовидный, комковатый</button>
-          <button class="chip" onclick="selectBristol(this,3)" style="text-align:left;">Тип 3: колбасовидный с трещинами</button>
-          <button class="chip" onclick="selectBristol(this,4)" style="text-align:left;">Тип 4: гладкий мягкий</button>
-          <button class="chip" onclick="selectBristol(this,5)" style="text-align:left;">Тип 5: мягкие комочки с ровными краями</button>
-          <button class="chip" onclick="selectBristol(this,6)" style="text-align:left;">Тип 6: рыхлый, неоформленный</button>
-          <button class="chip" onclick="selectBristol(this,7)" style="text-align:left;">Тип 7: жидкий, без комочков</button>
-          <button class="chip" onclick="selectBristol(this,8)" style="text-align:left;">Не было</button>
+      <div id="bristol-entries">
+        <div class="bristol-entry" style="margin-bottom:12px;">
+          <div style="font-size:12px;color:var(--text2);margin-bottom:6px;">Раз 1</div>
+          <div class="chips bristol-chips" style="flex-direction:column;gap:6px;">
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="1">Тип 1: отдельные твердые комочки</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="2">Тип 2: колбасовидный, комковатый</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="3">Тип 3: колбасовидный с трещинами</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="4">Тип 4: гладкий мягкий</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="5">Тип 5: мягкие комочки с ровными краями</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="6">Тип 6: рыхлый, неоформленный</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="7">Тип 7: жидкий, без комочков</button>
+            <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="0">Не было</button>
+          </div>
         </div>
       </div>
+      <button class="btn btn-ghost" onclick="addBristolEntry()" style="font-size:13px;padding:8px;">+ Ещё раз за день</button>
     </div>
 
     <button class="btn btn-primary" onclick="saveTracker()" style="margin-bottom:16px;">Сохранить день</button>
@@ -1360,15 +1374,89 @@ function getSelectedChips(parent) {
   return Array.from(parent.querySelectorAll('.chip.selected')).map(c => c.textContent.trim());
 }
 
-function selectBristol(el, val) {
-  bristolVal = val;
-  document.querySelectorAll('#bristol-chips .chip').forEach(c => c.classList.remove('selected'));
-  el.classList.add('selected');
-}
-
 // ===== WORKOUT =====
 function toggleWorkout(el) {
   document.getElementById('workout-details').style.display = el.checked ? 'block' : 'none';
+}
+
+function toggleWorkoutChip(el, val) {
+  document.querySelectorAll('#workout-chips .chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const otherInput = document.getElementById('tr-workout-other');
+  otherInput.style.display = val === '__other__' ? 'block' : 'none';
+  if (val !== '__other__') otherInput.value = '';
+}
+
+function toggleDischargeOther(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const inp = document.getElementById('tr-discharge-other');
+  inp.style.display = 'block';
+  inp.focus();
+}
+
+function toggleSexDetails(el) {
+  document.getElementById('sex-details').style.display = el.checked ? 'block' : 'none';
+}
+
+function toggleSexOther(el) {
+  el.closest('.chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  const inp = document.getElementById('tr-sex-other');
+  inp.style.display = 'block';
+  inp.focus();
+}
+
+// ===== ALCOHOL =====
+function addAlcohol() {
+  const list = document.getElementById('alcohol-list');
+  const div = document.createElement('div');
+  div.className = 'alcohol-entry';
+  div.style.cssText = 'display:flex;gap:8px;margin-bottom:8px;';
+  div.innerHTML = `
+    <input type="text" placeholder="Название напитка" style="flex:2;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;">
+    <input type="number" placeholder="мл" min="0" style="flex:1;padding:10px 12px;background:var(--bg);border:1px solid var(--border);border-radius:8px;color:var(--text);outline:none;">
+    <button onclick="this.parentElement.remove()" style="padding:8px;color:var(--text2);font-size:16px;">✕</button>
+  `;
+  list.appendChild(div);
+}
+
+// ===== BRISTOL =====
+let bristolCount = 1;
+function selectBristolEntry(el) {
+  el.closest('.bristol-chips').querySelectorAll('.chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+}
+
+function addBristolEntry() {
+  bristolCount++;
+  const container = document.getElementById('bristol-entries');
+  const div = document.createElement('div');
+  div.className = 'bristol-entry';
+  div.style.marginBottom = '12px';
+  div.innerHTML = `
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+      <span style="font-size:12px;color:var(--text2);">Раз ${bristolCount}</span>
+      <button onclick="this.closest('.bristol-entry').remove()" style="font-size:13px;color:var(--text2);">Удалить</button>
+    </div>
+    <div class="chips bristol-chips" style="flex-direction:column;gap:6px;">
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="1">Тип 1: отдельные твердые комочки</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="2">Тип 2: колбасовидный, комковатый</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="3">Тип 3: колбасовидный с трещинами</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="4">Тип 4: гладкий мягкий</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="5">Тип 5: мягкие комочки с ровными краями</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="6">Тип 6: рыхлый, неоформленный</button>
+      <button class="chip" onclick="selectBristolEntry(this)" style="text-align:left;" data-val="7">Тип 7: жидкий, без комочков</button>
+    </div>
+  `;
+  container.appendChild(div);
+}
+
+function getBristolEntries() {
+  return Array.from(document.querySelectorAll('.bristol-entry')).map(entry => {
+    const selected = entry.querySelector('.chip.selected');
+    return selected ? parseInt(selected.dataset.val) : null;
+  }).filter(v => v !== null);
 }
 
 // ===== TOAST =====
@@ -1481,35 +1569,61 @@ async function saveTracker() {
     if (inputs[0].value) meds.push({name: inputs[0].value, dose: inputs[1].value});
   });
 
-  const workoutTypes = getSelectedChips(document.getElementById('workout-chips'));
+  const workoutChipSelected = document.querySelector('#workout-chips .chip.selected');
+  const workoutTypeRaw = workoutChipSelected ? workoutChipSelected.textContent.trim() : null;
+  const workoutType = workoutTypeRaw === 'Другое'
+    ? (document.getElementById('tr-workout-other').value || 'Другое')
+    : workoutTypeRaw;
+
+  const alcoholEntries = [];
+  document.querySelectorAll('.alcohol-entry').forEach(row => {
+    const inputs = row.querySelectorAll('input');
+    if (inputs[0] && inputs[0].value) {
+      alcoholEntries.push({name: inputs[0].value, ml: parseInt(inputs[1].value) || null});
+    }
+  });
+
+  const dischargeChip = document.querySelector('#discharge-chips .chip.selected');
+  const dischargeRaw = dischargeChip ? dischargeChip.textContent.trim() : null;
+  const discharge = dischargeRaw === 'Другое'
+    ? (document.getElementById('tr-discharge-other').value || 'Другое')
+    : dischargeRaw;
+
+  const sexTypeChip = document.querySelector('#sex-chips .chip.selected');
+  const sexTypeRaw = sexTypeChip ? sexTypeChip.textContent.trim() : null;
+  const sexType = sexTypeRaw === 'Другое'
+    ? (document.getElementById('tr-sex-other').value || 'Другое')
+    : sexTypeRaw;
+
+  const sleepQSlider = document.getElementById('tr-sleep-q');
 
   const data = {
     id: 'tracker_' + today,
     dateKey: today,
     sleepH: parseFloat(document.getElementById('tr-sleep-h').value) || null,
-    sleepQ: ratings['sleep-q'] || null,
+    sleepQ: sleepQSlider.value !== '' ? parseInt(sleepQSlider.value) : null,
     sleepStart: document.getElementById('tr-sleep-start').value || null,
     sleepEnd: document.getElementById('tr-sleep-end').value || null,
     steps: parseInt(document.getElementById('tr-steps').value) || null,
     water: parseInt(document.getElementById('tr-water').value) || null,
     caffeine: parseInt(document.getElementById('tr-caffeine').value) || null,
-    alcoholQty: parseInt(document.getElementById('tr-alcohol-qty').value) || null,
-    alcoholType: document.getElementById('tr-alcohol-type').value || null,
+    alcohol: alcoholEntries,
     mood: ratings['mood'] || null,
     energy: ratings['energy'] || null,
     pain: document.getElementById('tr-pain').value || null,
     nutrition: document.getElementById('tr-nutrition').value || null,
     meds,
     workout: document.getElementById('tr-workout-toggle').checked,
-    workoutTypes,
+    workoutType,
     workoutDur: parseInt(document.getElementById('tr-workout-dur').value) || null,
     workoutNote: document.getElementById('tr-workout-note') ? document.getElementById('tr-workout-note').value : null,
     meditation: document.getElementById('tr-meditation').checked,
-    sex: document.getElementById('tr-sex').checked,
     lucid: document.getElementById('tr-lucid').checked,
+    sex: document.getElementById('tr-sex').checked,
+    sexType,
     cycleDay: parseInt(document.getElementById('tr-cycle-day').value) || null,
-    discharge: (selectedChips['discharge'] || []).join(', '),
-    bristol: bristolVal,
+    discharge,
+    bristol: getBristolEntries(),
     createdAt: new Date().toISOString()
   };
 
